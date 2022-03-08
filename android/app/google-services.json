@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "939688573387",
+    "project_id": "ice-time-cs4750-01",
+    "storage_bucket": "ice-time-cs4750-01.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939688573387:android:144d9e258aeea73dfd5e4e",
+        "android_client_info": {
+          "package_name": "edu.cpp.cs4750.icetimeapp.ice_time_fs_practice_log"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "939688573387-43c6849a7skse5ecjnf3ogifu7f3da8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7h4Qmy2by-zjXHctB_StjqKdOa_c2RXc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "939688573387-43c6849a7skse5ecjnf3ogifu7f3da8s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
