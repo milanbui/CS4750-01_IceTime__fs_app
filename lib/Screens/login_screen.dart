@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ice_time_fs_practice_log/Screens/forgot_password_screen.dart';
 import 'package:ice_time_fs_practice_log/bottom_navigation_bar_state.dart';
 import 'package:ice_time_fs_practice_log/Screens/signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('assets/images/fs_logo.png', height:200, width: 200),
+              Image.asset('assets/images/logo_image.png', height:200, width: 200),
               Container(
                 padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
                 child: Column(
@@ -67,8 +68,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         primary: Color(0xFF7C7C7C),
                         onSurface: Colors.red,
                       ),
-                      child: Text("forgot password", style: TextStyle(fontSize: 15)),
+                      child: Text("forgot password?", style: TextStyle(fontSize: 15)),
                       onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                        );
                       },
                     ),
                     ElevatedButton(

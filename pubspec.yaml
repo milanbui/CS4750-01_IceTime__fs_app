@@ -73,6 +73,9 @@ flutter:
   # https://flutter.dev/assets-and-images/#from-packages
   assets:
     - assets/images/fs_logo.png
+    - assets/images/splash_icon.png
+    - assets/images/logo_image.png
+    - assets/images/forgot_password_icon.png
 
   fonts:
     - family: JosefinSans

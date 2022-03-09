@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ice_time_fs_practice_log/Screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -25,7 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('assets/images/fs_logo.png', height:200, width: 200),
+              Image.asset('assets/images/logo_image.png', height:200, width: 200),
               Container(
                 padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
                 child: Column(
@@ -112,16 +111,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           FirebaseAuth.instance.createUserWithEmailAndPassword(
                               email: emailController.text,
                               password: passwordController.text)
-                              .then((value) async {
-                                // when successfull
-                               var user = FirebaseAuth.instance.currentUser;
-                               var id = user?.uid;
-                              // here you write the codes to input the data into firestore
-                                  FirebaseDatabase.instance.ref("users/" + id.toString()).set(
-                                    {
-                                      "name" : nameController.text
-                                    }
-                                  )
+                              .then((value) async {// when successfull
+                               User? user = FirebaseAuth.instance.currentUser;
+                               user?.updateDisplayName(nameController.text)
                                   .then((value) {
                                     showSuccessAlertDialog(context);
                                   })

@@ -21,9 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 200),
-              Image.asset('assets/images/splash_icon.png', height:200, width: 200),
-              SizedBox(height: 250),
+              SizedBox(height: 100),
+              Image.asset('assets/images/splash_icon.png', height: 400, width: 400),
+              SizedBox(height: 150),
               TextButton(
                 style: TextButton.styleFrom(
                   primary: Color(0xFF7C7C7C),
