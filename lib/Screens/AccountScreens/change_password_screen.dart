@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
-
-class ChangeEmailScreen extends StatefulWidget {
+class ChangePasswordScreen extends StatefulWidget {
   @override
-  _ChangeEmailScreenState createState() => _ChangeEmailScreenState();
+  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
 
-class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   TextEditingController emailController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  User? user = FirebaseAuth.instance.currentUser;
+    User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +38,17 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                   padding: EdgeInsets.fromLTRB(0, 0, 325, 0),
                 ),
                 SizedBox(height: 50),
+                Text("Change Password", style: TextStyle(color: Color(0xFF799FDA), fontWeight: FontWeight.bold, fontSize: 25)),
+                SizedBox(height: 25),
                 Container(
                   padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Email:', style: TextStyle(fontSize:15,fontWeight: FontWeight.bold, color : Color(0xFF454545))),
                       TextField(
                         controller: emailController,
-                        obscureText: true,
-                        enabled: false,
+                        obscureText: false,
+                        enabled: true,
                         decoration: InputDecoration(
                           border:
                           OutlineInputBorder(
@@ -56,7 +58,61 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                           contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                           filled: true,
                           fillColor: Colors.white,
-                          labelText: user != null ? user!.email : 'email',
+                          labelText: 'email',
+                          labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: true,
+                        enabled: true,
+                        decoration: InputDecoration(
+                          border:
+                          OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'current password',
+                          labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: newPasswordController,
+                        obscureText: true,
+                        enabled: true,
+                        decoration: InputDecoration(
+                          border:
+                          OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'new password',
+                          labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: confirmPasswordController,
+                        obscureText: true,
+                        enabled: true,
+                        decoration: InputDecoration(
+                          border:
+                          OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'confirm new password',
                           labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
                         ),
                       ),
@@ -73,17 +129,29 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                   ),
                   child: Text("done", style: TextStyle(fontSize: 18)),
                   onPressed: () {
-                    if(user != null) {
-                      user!.updateEmail(emailController.text)
+                    if(newPasswordController.text == confirmPasswordController.text) {
+                      AuthCredential credential = EmailAuthProvider.credential(
+                          email: emailController.text,
+                          password: passwordController.text);
+                      FirebaseAuth.instance.currentUser!
+                          .reauthenticateWithCredential(credential)
                           .then((value) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => AccountScreen()),
-                              );
+                            value.user!.updatePassword(newPasswordController.text)
+                            .then((value) {
+                              showSuccessAlertDialog(
+                              context, "Your password has been updated.",
+                              "account");
+                            })
+                            .catchError((error) {
+                              showErrorAlertDialog(context, error.toString());
+                            });
                           })
                           .catchError((error) {
-                              showErrorAlertDialog(context, error.toString());
+                            showErrorAlertDialog(context, error.toString());
                           });
+                    }
+                    else {
+                      showErrorAlertDialog(context, "Passwords do not match");
                     }
                   },
                 ),

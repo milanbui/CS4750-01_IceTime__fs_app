@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
 import 'package:ice_time_fs_practice_log/Screens/login_screen.dart';
+import 'package:ice_time_fs_practice_log/Screens/splash_screen.dart';
 
-showSuccessAlertDialog(BuildContext context) {
+showSuccessAlertDialog(BuildContext context, String text, String page) {
 
   // set up the button
   Widget okButton = TextButton(
-    child: Text("continue", style: TextStyle(color: Color(0xFF799FDA), fontSize: 18)),
+    child: Text("ok", style: TextStyle(color: Color(0xFF799FDA), fontSize: 18)),
     onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
+      if(page == "sign up") {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      }
+      else if(page == "account") {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AccountScreen()),
+        );
+      }
+      else if(page == "account") {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SplashScreen(title: "title"))
+        );
+      }
     },
   );
 
@@ -18,7 +34,7 @@ showSuccessAlertDialog(BuildContext context) {
   AlertDialog alert = AlertDialog(
       title: Text("Success!"),
       titleTextStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF98BEEB), fontSize: 20),
-      content: Text("Congratulations, your account has been successfully created."),
+      content: Text(text),
       actions: [
         okButton,
       ],

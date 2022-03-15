@@ -1,6 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ice_time_fs_practice_log/Screens/AccountScreens/change_password_screen.dart';
+import 'package:ice_time_fs_practice_log/Screens/AccountScreens/delete_account_screen.dart';
+import 'AccountScreens/change_email_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -11,9 +14,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-
-
+  String _name = "First Last";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,12 +26,34 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(height: 100),
                 CircleAvatar(
                     backgroundColor: Color(0xFF799FDA),
-                    // backgroundImage: AssetImage('assets/images/logo_image.png'),
                     radius: 80.0,
                     child: Icon(Icons.person, size: 100, color:Color(0xFFE5E5E5))
                 ),
                 SizedBox(height:15),
-                Text("First Last", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Color(0xFF454545))),
+                FutureBuilder<String>(
+                    future: getName(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          snapshot.data.toString(),
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: const Color(0xFF454545),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else {
+                        return Text(
+                          "First Last",
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: const Color(0xFF454545),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
+                    },
+                ),
                 SizedBox(height:50),
                 TextButton(
                   onPressed: () {
@@ -44,6 +67,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 TextButton(
                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ChangeEmailScreen()),
+                    );
                   },
                   style: TextButton.styleFrom(
                       primary: Color(0xFF7C7C7C),
@@ -54,6 +81,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 TextButton(
                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                    );
                   },
                   style: TextButton.styleFrom(
                       primary: Color(0xFF7C7C7C),
@@ -65,6 +96,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(height: 150),
                 TextButton(
                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DeleteAccountScreen()),
+                    );
                   },
                   style: TextButton.styleFrom(
                       primary: Colors.red,
@@ -77,5 +112,15 @@ class _AccountScreenState extends State<AccountScreen> {
           )
       ),
     );
+  }
+
+  Future<String> getName() async {
+    final ref = FirebaseDatabase.instance.ref("users/");
+    User? cuser = await FirebaseAuth.instance!.currentUser;
+
+    return ref.child(cuser!.uid).child("name").once().then((DataSnapshot) {
+      final String username = DataSnapshot.snapshot.value.toString();
+      return username;
+    });
   }
 }

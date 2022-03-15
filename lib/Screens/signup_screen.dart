@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ice_time_fs_practice_log/Screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -109,17 +110,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () {
                         if(passwordController.text == confirmPasswordController.text) {
                           FirebaseAuth.instance.createUserWithEmailAndPassword(
-                              email: emailController.text,
-                              password: passwordController.text)
-                              .then((value) async {// when successfull
-                               User? user = FirebaseAuth.instance.currentUser;
-                               user?.updateDisplayName(nameController.text)
-                                  .then((value) {
-                                    showSuccessAlertDialog(context);
-                                  })
-                                  .catchError((error) {
-                                    showErrorAlertDialog(context, error.toString());
-                                  });
+                              email: emailController.text, password: passwordController.text)
+                              .then((authResult) {
+
+                                if(authResult.user != null) {
+
+                                  var profile = {
+                                    "uid" : authResult.user!.uid,
+                                    "name" : nameController.text
+                                  };
+
+                                  FirebaseDatabase.instance.ref("users/"+ authResult.user!.uid).set(profile)
+                                    .then((value) {
+                                      showSuccessAlertDialog(context, "Congratulations, your account has been successfully created.", "sign up");
+                                    })
+                                    .catchError((error) {
+                                      showErrorAlertDialog(context, error.toString());
+                                    });
+                                }
                               })
                               .catchError((error) {
                                     showErrorAlertDialog(context, error.toString());

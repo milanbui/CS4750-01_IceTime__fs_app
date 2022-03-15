@@ -88,7 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         FirebaseAuth.instance.signInWithEmailAndPassword(
                             email: emailController.text,
                             password: passwordController.text)
-                        .then((value) {
+                        .then((result) {
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => BottomNavBarState()),
