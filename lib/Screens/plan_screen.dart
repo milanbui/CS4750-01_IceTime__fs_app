@@ -17,6 +17,7 @@ class _PlanScreenState extends State<PlanScreen> {
       _isEditMode = !_isEditMode;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,36 +42,6 @@ class _PlanScreenState extends State<PlanScreen> {
                       ]
                       ),
                     ),
-                    Container(
-                      height: 50,
-                      width: 350,
-                      decoration: BoxDecoration(
-                        color: Color(0xFF98BEEB),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Weekly Practice Hour Goal: ", style: TextStyle(fontSize: 12, color: Color(0xFF454545))),
-                            SizedBox(
-                              width: 50,
-                              height: 100,
-                              child:
-                                TextField(
-                                  enabled: _isEditMode,
-                                  decoration: InputDecoration(
-                                    border:
-                                    OutlineInputBorder(
-                                      borderSide: _isEditMode ? BorderSide(color: Colors.white) : BorderSide.none ,
-                                    ),
-                                    filled: false,
-                                  ),
-                                )
-                            )
-                          ],
-                      )
-                    ),
-                    SizedBox(height: 15),
                     Container(
                       height: 250,
                       width: 350,

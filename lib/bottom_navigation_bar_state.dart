@@ -7,11 +7,11 @@ import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
 
 
 class BottomNavBarState extends StatefulWidget {
-  @override
-  _BottomNavBarStateState createState() => _BottomNavBarStateState();
+    @override
+    _BottomNavBarState createState() => _BottomNavBarState();
 }
 
-class _BottomNavBarStateState extends State<BottomNavBarState> {
+class _BottomNavBarState extends State<BottomNavBarState> {
 
   int _selectedIndex = 2;
 
@@ -22,6 +22,7 @@ class _BottomNavBarStateState extends State<BottomNavBarState> {
     SharpeningLogScreen(),
     AccountScreen(),
   ];
+
 
   void _onItemTapped(int index) {
     setState(() {

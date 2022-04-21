@@ -21,7 +21,7 @@ showSuccessAlertDialog(BuildContext context, String text, String page) {
           MaterialPageRoute(builder: (context) => AccountScreen()),
         );
       }
-      else if(page == "account") {
+      else if(page == "delete") {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SplashScreen(title: "title"))

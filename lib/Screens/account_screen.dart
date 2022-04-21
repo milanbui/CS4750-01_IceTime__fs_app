@@ -63,7 +63,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     onSurface: Colors.red,
                     padding: EdgeInsets.fromLTRB(20, 0, 0, 0)
                   ),
-                  child: Text("Change Profile Picture", style: TextStyle(fontSize: 15)),
+                  child: Text("Change Name", style: TextStyle(fontSize: 15)),
                 ),
                 TextButton(
                   onPressed: () {

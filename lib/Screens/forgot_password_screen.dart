@@ -22,45 +22,54 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
-                },
-                icon: Icon(Icons.arrow_back),
-                color: Color(0xFF454545),
-                iconSize: 35,
-                focusColor: Colors.white,
-                padding: EdgeInsets.fromLTRB(0, 0, 325, 0),
+              Expanded(
+                flex: 15,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.arrow_back),
+                  color: Color(0xFF454545),
+                  iconSize: 35,
+                  focusColor: Colors.white,
+                  padding: EdgeInsets.fromLTRB(0, 0, 325, 0),
+                ),
               ),
-              SizedBox(height:70),
-              Image.asset('assets/images/forgot_password_icon.png', height: 200),
-              SizedBox(height:15),
-              Text("Forgot Your Password?", style: TextStyle(color: Color(0xFF799FDA), fontSize: 28, fontWeight: FontWeight.bold)),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(40, 10, 40, 50),
-                child: Text("Enter the email associated with your account to receive instructions to reset your password.", style: TextStyle(color: Color(0xFF7C7C7C), fontSize: 15)),
+              Expanded(
+                flex: (MediaQuery.of(context).viewInsets.bottom == 0) ? 40 : 40,
+                child: Column(
+                  children: [
+                    Image.asset('assets/images/forgot_password_icon.png', height: (MediaQuery.of(context).viewInsets.bottom == 0) ? 200 : 150),
+                    SizedBox(height:15),
+                    Text("Forgot Your Password?", style: TextStyle(color: Color(0xFF799FDA), fontSize: 28, fontWeight: FontWeight.bold)),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
+                      child: Text("Enter the email associated with your account to receive instructions to reset your password.", style: TextStyle(color: Color(0xFF7C7C7C), fontSize: 15)),
+                    ),
+                  ],
+                ),
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
+              Expanded(
+                flex: (MediaQuery.of(context).viewInsets.bottom == 0) ? 50 : 25,
                 child: Column(
                   children: <Widget> [
-                    TextField(
-                      controller: emailController,
-                      obscureText: false,
-                      decoration: InputDecoration(
-                        border:
-                        OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                          borderSide: BorderSide.none,
+                    Container(
+                      margin: EdgeInsets.fromLTRB(25, 20, 25, 10),
+                      child: TextField(
+                        controller: emailController,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                          border:
+                          OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          filled: true,
+                          fillColor: Colors.white,
+                          labelText: 'email',
+                          labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
                         ),
-                        contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                        filled: true,
-                        fillColor: Colors.white,
-                        labelText: 'email',
-                        labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
                       ),
                     ),
                     SizedBox(height: 10),
@@ -86,7 +95,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         });
                       },
                     ),
-                    SizedBox(height: 200)
                   ],
                 ),
               ),

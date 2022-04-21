@@ -24,12 +24,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                SizedBox(height: 30),
                 IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AccountScreen()),
-                    );
+                    Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back),
                   color: Color(0xFF454545),

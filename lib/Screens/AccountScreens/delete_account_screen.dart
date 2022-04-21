@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+import '../../bottom_navigation_bar_state.dart';
+
 class DeleteAccountScreen extends StatefulWidget {
   @override
   _DeleteAccountScreenState createState() => _DeleteAccountScreenState();
@@ -22,12 +26,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                SizedBox(height:30),
                 IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AccountScreen()),
-                    );
+                    Navigator.of(context).pop();
                   },
                   icon: Icon(Icons.arrow_back),
                   color: Color(0xFF454545),
@@ -83,7 +85,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 350),
+                SizedBox(height: (MediaQuery.of(context).viewInsets.bottom == 0) ? 350 : 100),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
@@ -100,11 +102,21 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     FirebaseAuth.instance.currentUser!
                         .reauthenticateWithCredential(credential)
                         .then((value) {
+                          var id = FirebaseAuth.instance.currentUser!.uid;
+                          print(id);
                           value.user!.delete()
                           .then((value) {
-                            showSuccessAlertDialog(
-                            context, "Your account has been deleted.",
-                            "delete");
+
+                            FirebaseDatabase.instance.ref("users/" + id).remove()
+                            .then((value) {
+                              showSuccessAlertDialog(
+                                  context, "Your account has been deleted.",
+                                  "delete");
+                            })
+                            .catchError((error) {
+                              showErrorAlertDialog(context, error.toString());
+                            });
+
                           })
                           .catchError((error) {
                             showErrorAlertDialog(context, error.toString());
@@ -122,4 +134,3 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     );
   }
 }
-
