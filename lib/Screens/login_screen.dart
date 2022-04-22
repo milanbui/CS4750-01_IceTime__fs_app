@@ -96,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             email: emailController.text,
                             password: passwordController.text)
                         .then((result) {
-
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => BottomNavBarState()),

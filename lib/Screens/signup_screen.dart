@@ -25,6 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Logo
               Expanded(
                   // If keyboard is not open, flex 40 else flex 20
                   flex: (MediaQuery.of(context).viewInsets.bottom == 0) ? 40 : 20,
@@ -37,6 +38,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Column(
                     children: <Widget> [
                       SizedBox(height: 15),
+                      // Name text box
                       TextField(
                         controller: nameController,
                         obscureText: false,
@@ -54,6 +56,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
+                      // Email text box
                       TextField(
                         controller: emailController,
                         obscureText: false,
@@ -71,6 +74,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
+                      // Password text box
                       TextField(
                         controller: passwordController,
                         obscureText: true,
@@ -88,6 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
+                      // Confirm password text box
                       TextField(
                         controller: confirmPasswordController,
                         obscureText: true,
@@ -105,6 +110,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 15),
+                      // Sign up button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Color(0xFF799FDA),
@@ -114,9 +120,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         child: Text("sign up", style: TextStyle(fontSize: 18)),
                         onPressed: () {
+                          // If passwords match
                           if(passwordController.text == confirmPasswordController.text) {
+
+                            // Creates user
                             FirebaseAuth.instance.createUserWithEmailAndPassword(
                                 email: emailController.text, password: passwordController.text)
+                                // If successfully created in firebase authenticate
                                 .then((authResult) {
 
                                   if(authResult.user != null) {
@@ -127,12 +137,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     };
 
                                     FirebaseDatabase.instance.ref("users/"+ authResult.user!.uid).set(profile)
-                                      .then((value) {
-                                        showSuccessAlertDialog(context, "Congratulations, your account has been successfully created.", "sign up");
-                                      })
-                                      .catchError((error) {
-                                        showErrorAlertDialog(context, error.toString());
-                                      });
+                                        .then((value) {
+                                      showSuccessAlertDialog(context, "Congratulations, your account has been successfully created.", "sign up");
+                                    })
+                                        .catchError((error) {
+                                      showErrorAlertDialog(context, error.toString());
+                                    });
                                   }
                                 })
                                 .catchError((error) {
@@ -151,6 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               Expanded(
                 flex: 10,
+                // Go back to log in
                 child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,

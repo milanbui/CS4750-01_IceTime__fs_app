@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
-import 'package:firebase_database/firebase_database.dart';
+
 
 import '../../bottom_navigation_bar_state.dart';
 
@@ -106,8 +105,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                           print(id);
                           value.user!.delete()
                           .then((value) {
-
-                            FirebaseDatabase.instance.ref("users/" + id).remove()
+/*
+                            FirebaseFirestore.instance.collection("users").delete()
                             .then((value) {
                               showSuccessAlertDialog(
                                   context, "Your account has been deleted.",
@@ -116,7 +115,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                             .catchError((error) {
                               showErrorAlertDialog(context, error.toString());
                             });
-
+*/
                           })
                           .catchError((error) {
                             showErrorAlertDialog(context, error.toString());

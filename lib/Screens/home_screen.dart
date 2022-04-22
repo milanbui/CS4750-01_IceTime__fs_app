@@ -1,4 +1,4 @@
-import 'package:syncfusion_flutter_calendar/calendar.dart';
+
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,9 +8,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isEditMode = false;
-
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
 
   void _changeMode() {
     setState(() {
