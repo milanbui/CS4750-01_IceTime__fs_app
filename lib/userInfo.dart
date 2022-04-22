@@ -22,13 +22,12 @@ class CurrentUserInfo {
     });
   }
 
-  static void setPracticeLogs(){
-    String id = FirebaseAuth.instance.currentUser!.uid;
+  static void setPracticeLogs() {
+    String id =  FirebaseAuth.instance.currentUser!.uid;
     List temp = [];
     FirebaseDatabase.instance.ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
       for(DataSnapshot data in event.snapshot.children.toList()) {
         temp.add(data.value);
-        print(data.value);
       }
       _practiceLogs = temp;
     });

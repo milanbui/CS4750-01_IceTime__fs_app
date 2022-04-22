@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ice_time_fs_practice_log/Screens/add_practice_log_screen.dart';
 
 import '../userInfo.dart';
 
@@ -12,13 +13,14 @@ class PracticeLogScreen extends StatefulWidget {
 
 class _PracticeLogScreenState extends State<PracticeLogScreen> {
   bool _isEditMode = false;
-  List _logsList = CurrentUserInfo.getPracticeLogs();
+  List _logsList =  CurrentUserInfo.getPracticeLogs();
 
   void _changeMode() {
     setState(() {
       _isEditMode = !_isEditMode;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,10 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                           color: Color(0xFF454545),
                           focusColor: Colors.white,
                           onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => AddPracticeLogScreen())
+                            ).then((value) => setState(()async {_logsList =  await CurrentUserInfo.getPracticeLogs();}));
                           },
                         ),
                       ),
@@ -64,11 +70,29 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                     itemCount: _logsList.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
+                          margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF98BEEB),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_logsList[index]['date'].toString()),
-                            Text(_logsList[index]['hours'].toString()),
-                            Text(_logsList[index]['notes'].toString()),
+                            Container(
+                                margin: EdgeInsets.fromLTRB(15, 15, 15, 5),
+                                child: Text("DATE: " + _logsList[index]['date'].toString())
+                            ),
+                            Container(
+                                margin: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                child: Text(
+                                    "HOURS: " + _logsList[index]['hours'].toString() + (_logsList[index]['hours'] == 1 ? "hr" : " hrs")
+                                )
+                            ),
+                            Container(
+                                margin: EdgeInsets.fromLTRB(15, 5, 15, 15),
+                                child: Text("NOTES:\n" + _logsList[index]['notes'].toString())
+                            ),
+
                           ],
                         )
                       );

@@ -37,31 +37,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     radius: 80.0,
                     child: Icon(Icons.person, size: 100, color:Color(0xFFE5E5E5))
                 ),
-                SizedBox(height:15), /*
-                FutureBuilder<String>(
-                    future: getName(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(
-                          snapshot.data.toString(),
-                          style: TextStyle(
-                            fontSize: 28,
-                            color: const Color(0xFF454545),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      } else {
-                        return Text(
-                          "First Last",
-                          style: TextStyle(
-                            fontSize: 28,
-                            color: const Color(0xFF454545),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-                    },
-                ),*/
+                SizedBox(height:15),
                 Text(_name,
                   style: TextStyle(
                     fontSize: 28,
@@ -126,15 +102,5 @@ class _AccountScreenState extends State<AccountScreen> {
           )
       ),
     );
-  }
-
-  String getName() {
-
-    String id = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid +"/name").onValue.listen((DatabaseEvent event) {
-      _name = event.snapshot.value.toString();
-    });
-
-    return _name;
   }
 }
