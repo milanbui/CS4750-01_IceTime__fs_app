@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
-import 'package:ice_time_fs_practice_log/bottom_navigation_bar_state.dart';
-import 'package:ice_time_fs_practice_log/userInfo.dart';
 class AddPracticeLogScreen extends StatefulWidget {
   @override
   _AddPracticeLogScreenState createState() => _AddPracticeLogScreenState();
@@ -14,8 +12,8 @@ class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
   TextEditingController dateController = TextEditingController();
   TextEditingController hoursController = TextEditingController();
   TextEditingController notesController = TextEditingController();
-
   User? user = FirebaseAuth.instance.currentUser;
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +107,7 @@ class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
                     minimumSize: Size(150, 35),
                   ),
                   child: Text("done", style: TextStyle(fontSize: 18)),
-                  onPressed: () {
+                  onPressed: () async {
                     var log = {
                       "date" : dateController.text,
                       "hours" : hoursController.text,
@@ -117,8 +115,9 @@ class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
                     };
 
                     FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/logs/" + log['date'].toString()).set(log)
-                      .then((value) {
+                         .then((value)  {
                           Navigator.pop(context);
+
                         }).catchError((error) {
                           showErrorAlertDialog(context, error.toString());
                         });

@@ -4,22 +4,28 @@ import 'package:ice_time_fs_practice_log/Screens/AccountScreens/delete_account_s
 import 'AccountScreens/change_email_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:ice_time_fs_practice_log/userInfo.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
   _AccountScreenState createState() => _AccountScreenState();
 }
 
+
 class _AccountScreenState extends State<AccountScreen> {
 
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  String _name = CurrentUserInfo.getName();
+  String _name = "";
 
-  void updateName() {
-    setState(() {
-        CurrentUserInfo.setName();
+  @override
+  void initState() {
+    super.initState();
+
+    String id = FirebaseAuth.instance.currentUser!.uid;
+    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid +"/name").onValue.listen((DatabaseEvent event) {
+      setState(() {
+        _name = event.snapshot.value.toString();
+      });
     });
   }
 

@@ -10,19 +10,13 @@ showSuccessAlertDialog(BuildContext context, String text, String page) {
     child: Text("ok", style: TextStyle(color: Color(0xFF799FDA), fontSize: 18)),
     onPressed: () {
       if(page == "sign up") {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
+        Navigator.of(context).pop();
       }
       else if(page == "account") {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AccountScreen()),
-        );
+        Navigator.of(context).pop();
       }
       else if(page == "delete") {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => SplashScreen(title: "title"))
         );

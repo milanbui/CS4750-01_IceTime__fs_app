@@ -4,7 +4,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/Screens/add_practice_log_screen.dart';
 
-import '../userInfo.dart';
 
 class PracticeLogScreen extends StatefulWidget {
   @override
@@ -13,7 +12,27 @@ class PracticeLogScreen extends StatefulWidget {
 
 class _PracticeLogScreenState extends State<PracticeLogScreen> {
   bool _isEditMode = false;
-  List _logsList =  CurrentUserInfo.getPracticeLogs();
+  List _logsList =  [];
+  bool _progressController = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    String id =  FirebaseAuth.instance.currentUser!.uid;
+    List temp = [];
+    FirebaseDatabase.instance.ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
+      setState(() {
+        _logsList = [];
+        for(DataSnapshot data in event.snapshot.children.toList()) {
+          _logsList.add(data.value);
+        }
+
+        _progressController = false;
+      });
+    });
+
+  }
 
   void _changeMode() {
     setState(() {
@@ -21,11 +40,10 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFC8DDFD),
+      backgroundColor: const Color(0xFFC8DDFD),
       body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -40,22 +58,21 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 25, 0, 5),
                         child: IconButton(
-                          icon: Icon(Icons.add),
-                          color: Color(0xFF454545),
+                          icon: const Icon(Icons.add),
+                          color: const Color(0xFF454545),
                           focusColor: Colors.white,
-                          onPressed: () {
+                          onPressed: ()  {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => AddPracticeLogScreen())
-                            ).then((value) => setState(()async {_logsList =  await CurrentUserInfo.getPracticeLogs();}));
+                                MaterialPageRoute(builder: (context) => AddPracticeLogScreen()));
                           },
                         ),
                       ),
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 25, 10, 5),
                         child: IconButton(
-                          icon: _isEditMode ? Icon(Icons.done) : Icon(Icons.edit),
-                          color: Color(0xFF454545),
+                          icon: _isEditMode ? const Icon(Icons.done) : const Icon(Icons.edit),
+                          color: const Color(0xFF454545),
                           focusColor: Colors.white,
                           onPressed: () {
                             _changeMode();
@@ -66,12 +83,13 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                 ),
                 Expanded(
                   flex: 80,
-                  child: ListView.builder(
+                  child: _progressController ? CircularProgressIndicator() :
+                  ListView.builder(
                     itemCount: _logsList.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
-                          margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                          decoration: BoxDecoration(
+                          margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                          decoration: const BoxDecoration(
                             color: Color(0xFF98BEEB),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
@@ -79,17 +97,17 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                                margin: EdgeInsets.fromLTRB(15, 15, 15, 5),
+                                margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
                                 child: Text("DATE: " + _logsList[index]['date'].toString())
                             ),
                             Container(
-                                margin: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
                                 child: Text(
                                     "HOURS: " + _logsList[index]['hours'].toString() + (_logsList[index]['hours'] == 1 ? "hr" : " hrs")
                                 )
                             ),
                             Container(
-                                margin: EdgeInsets.fromLTRB(15, 5, 15, 15),
+                                margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
                                 child: Text("NOTES:\n" + _logsList[index]['notes'].toString())
                             ),
 

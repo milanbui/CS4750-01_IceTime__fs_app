@@ -4,7 +4,6 @@ import 'package:ice_time_fs_practice_log/Screens/home_screen.dart';
 import 'package:ice_time_fs_practice_log/Screens/practice_log_screen.dart';
 import 'package:ice_time_fs_practice_log/Screens/sharpening_log_screen.dart';
 import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
-import 'package:ice_time_fs_practice_log/userInfo.dart';
 
 
 class BottomNavBarState extends StatefulWidget {

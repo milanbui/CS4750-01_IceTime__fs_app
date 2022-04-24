@@ -133,7 +133,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                                     var profile = {
                                       "uid" : authResult.user!.uid,
-                                      "name" : nameController.text
+                                      "name" : nameController.text == "" ? "First Last" : nameController.text
                                     };
 
                                     FirebaseDatabase.instance.ref("users/"+ authResult.user!.uid).set(profile)

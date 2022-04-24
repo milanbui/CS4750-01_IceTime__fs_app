@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ice_time_fs_practice_log/Screens/login_screen.dart';
-import 'package:ice_time_fs_practice_log/bottom_navigation_bar_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
 
