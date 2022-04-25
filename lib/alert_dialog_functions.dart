@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
-import 'package:ice_time_fs_practice_log/Screens/login_screen.dart';
 import 'package:ice_time_fs_practice_log/Screens/splash_screen.dart';
 
 showSuccessAlertDialog(BuildContext context, String text, String page) {
@@ -9,10 +7,8 @@ showSuccessAlertDialog(BuildContext context, String text, String page) {
   Widget okButton = TextButton(
     child: Text("ok", style: TextStyle(color: Color(0xFF799FDA), fontSize: 18)),
     onPressed: () {
-      if(page == "sign up") {
+      if(page == "sign up" || page == "account") {
         Navigator.of(context).pop();
-      }
-      else if(page == "account") {
         Navigator.of(context).pop();
       }
       else if(page == "delete") {

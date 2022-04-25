@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ice_time_fs_practice_log/Screens/add_practice_log_screen.dart';
+import 'package:ice_time_fs_practice_log/Screens/PracticeLogScreens/add_practice_log_screen.dart';
+
+import 'PracticeLogScreens/edit_practice_log_screen.dart';
 
 
 class PracticeLogScreen extends StatefulWidget {
@@ -52,7 +54,7 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Container(
-                        margin: const EdgeInsets.fromLTRB(160, 25, 50, 5),
+                        margin: const EdgeInsets.fromLTRB(150, 25, 100, 5),
                         child: Image.asset('assets/images/logo_image.png', height:60, width: 60),
                       ),
                       Container(
@@ -68,50 +70,51 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                           },
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(0, 25, 10, 5),
-                        child: IconButton(
-                          icon: _isEditMode ? const Icon(Icons.done) : const Icon(Icons.edit),
-                          color: const Color(0xFF454545),
-                          focusColor: Colors.white,
-                          onPressed: () {
-                            _changeMode();
-                          },
-                        ),
-                      ),
                     ]
                 ),
                 Expanded(
                   flex: 80,
-                  child: _progressController ? CircularProgressIndicator() :
+                  child: _progressController ?
+                  Container(
+                      margin: EdgeInsets.fromLTRB(10, 290, 10, 290),
+                      child: CircularProgressIndicator(color: Color(0xFF454545))
+                  ) :
                   ListView.builder(
                     itemCount: _logsList.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                          margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF98BEEB),
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
-                                child: Text("DATE: " + _logsList[index]['date'].toString())
+                      return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => EditPracticeLogScreen(_logsList[index]['date'].toString())));
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF98BEEB),
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
                             ),
-                            Container(
-                                margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-                                child: Text(
-                                    "HOURS: " + _logsList[index]['hours'].toString() + (_logsList[index]['hours'] == 1 ? "hr" : " hrs")
-                                )
-                            ),
-                            Container(
-                                margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
-                                child: Text("NOTES:\n" + _logsList[index]['notes'].toString())
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
+                                  child: Text("DATE: " + _logsList[index]['date'].toString())
+                              ),
+                              Container(
+                                  margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                  child: Text(
+                                      "HOURS: " + _logsList[index]['hours'].toString() + (_logsList[index]['hours'] == 1 ? "hr" : " hrs")
+                                  )
+                              ),
+                              Container(
+                                  constraints: BoxConstraints(maxHeight: 55),
+                                  margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),
+                                  child: Text("NOTES:\n" + _logsList[index]['notes'].toString())
+                              ),
 
-                          ],
+                            ],
+                          )
                         )
                       );
                     },

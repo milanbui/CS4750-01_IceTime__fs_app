@@ -3,18 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-
-class DeleteAccountScreen extends StatefulWidget {
+class ChangeNameScreen extends StatefulWidget {
   @override
-  _DeleteAccountScreenState createState() => _DeleteAccountScreenState();
+  _ChangeNameScreenState createState() => _ChangeNameScreenState();
 }
 
-class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
+class _ChangeNameScreenState extends State<ChangeNameScreen> {
 
-  TextEditingController emailController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-    User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +21,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                SizedBox(height:30),
+                SizedBox(height: 30),
                 IconButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -36,17 +33,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   padding: EdgeInsets.fromLTRB(0, 0, 325, 0),
                 ),
                 SizedBox(height: 50),
-                Text("Delete Account", style: TextStyle(color: Color(0xFF799FDA), fontWeight: FontWeight.bold, fontSize: 25)),
+                Text("Change Name", style: TextStyle(color: Color(0xFF799FDA), fontWeight: FontWeight.bold, fontSize: 25)),
+                SizedBox(height: 25),
                 Container(
                   padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 15),
-                      Text("After you delete an account, it's permanently deleted. Accounts can't be undeleted.", style: TextStyle(color: Color(0xFF454545), fontSize: 16)),
-                      SizedBox(height: 25),
                       TextField(
-                        controller: emailController,
+                        controller: nameController,
                         obscureText: false,
                         enabled: true,
                         decoration: InputDecoration(
@@ -58,7 +53,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                           contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                           filled: true,
                           fillColor: Colors.white,
-                          labelText: 'email',
+                          labelText: 'name',
                           labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
                         ),
                       ),
@@ -83,46 +78,36 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: (MediaQuery.of(context).viewInsets.bottom == 0) ? 350 : 100),
+                SizedBox(height: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
+                    primary: Color(0xFF799FDA),
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
                     minimumSize: Size(150, 35),
                   ),
-                  child: Text("delete account", style: TextStyle(fontSize: 18)),
+                  child: Text("done", style: TextStyle(fontSize: 18)),
                   onPressed: () {
 
                     AuthCredential credential = EmailAuthProvider.credential(
-                        email: emailController.text,
+                        email: FirebaseAuth.instance.currentUser!.email.toString(),
                         password: passwordController.text);
                     FirebaseAuth.instance.currentUser!
                         .reauthenticateWithCredential(credential)
                         .then((value) {
-                          var id = FirebaseAuth.instance.currentUser!.uid;
-                          value.user!.delete()
+                            FirebaseDatabase.instance.ref("users/" + value.user!.uid).update({'name' : nameController.text})
                           .then((value) {
-
-                            FirebaseDatabase.instance.ref("users/" + id).remove()
-                            .then((value) {
-                              showSuccessAlertDialog(
-                                  context, "Your account has been deleted.",
-                                  "delete");
-                            })
-                            .catchError((error) {
-                              showErrorAlertDialog(context, error.toString());
-                            });
-
-                          })
+                        showSuccessAlertDialog(
+                            context, "Your name has been updated.",
+                            "account");
+                      })
                           .catchError((error) {
-                            showErrorAlertDialog(context, error.toString());
-                          });
-                        })
+                        showErrorAlertDialog(context, error.toString());
+                      });
+                    })
                         .catchError((error) {
-                          showErrorAlertDialog(context, error.toString());
-                        });
-
+                      showErrorAlertDialog(context, error.toString());
+                    });
                   },
                 ),
               ]
@@ -131,3 +116,4 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     );
   }
 }
+
