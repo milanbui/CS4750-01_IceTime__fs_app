@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../alert_dialog_functions.dart';
+
 class PlanScreen extends StatefulWidget {
   @override
   _PlanScreenState createState() => _PlanScreenState();
@@ -12,7 +14,6 @@ class _PlanScreenState extends State<PlanScreen> {
   bool _isEditMode = false;
   TextEditingController warmUpPlanController = TextEditingController();
   TextEditingController practicePlanController = TextEditingController();
-  bool _progressController = true;
 
   void _changeMode() {
     setState(() {
@@ -31,15 +32,9 @@ class _PlanScreenState extends State<PlanScreen> {
         .onValue
         .listen((DatabaseEvent event) {
       setState(() {
-        List temp = [];
 
-        for (DataSnapshot snap in event.snapshot.children.toList()) {
-          temp.add(snap.value);
-        }
-        warmUpPlanController = TextEditingController(text: temp[0]);
-        practicePlanController = TextEditingController(text: temp[1]);
-
-        _progressController = false;
+        warmUpPlanController = TextEditingController(text: event.snapshot.child('warmUpPlan').value.toString());
+        practicePlanController = TextEditingController(text: event.snapshot.child('practicePlan').value.toString());
       });
     });
   }
@@ -66,6 +61,18 @@ class _PlanScreenState extends State<PlanScreen> {
                               color: Color(0xFF454545),
                               focusColor: Colors.white,
                               onPressed: () {
+                                if(_isEditMode) {
+                                  var plans = {
+                                    'warmUpPlan' : warmUpPlanController.text,
+                                    'practicePlan' : practicePlanController.text
+                                  };
+                                  FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/plans/").update(plans)
+                                      .then((value)  {
+
+                                  }).catchError((error) {
+                                    showErrorAlertDialog(context, error.toString());
+                                  });
+                                }
                                 _changeMode();
                               },
                             ),

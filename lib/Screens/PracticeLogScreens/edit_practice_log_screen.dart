@@ -26,14 +26,9 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
     String id =  FirebaseAuth.instance.currentUser!.uid;
     FirebaseDatabase.instance.ref("users/" + id + "/logs/" + widget.d).onValue.listen((DatabaseEvent event) {
       setState(() {
-        List temp = [];
-
-        for(DataSnapshot snap in event.snapshot.children.toList()) {
-          temp.add(snap.value);
-        }
-        _dateController = TextEditingController(text: temp[0]);
-        _hoursController = TextEditingController(text: temp[1]);
-        _notesController = TextEditingController(text: temp[2]);
+        _dateController = TextEditingController(text: event.snapshot.child('date').value.toString());
+        _hoursController = TextEditingController(text: event.snapshot.child('hours').value.toString());
+        _notesController = TextEditingController(text: event.snapshot.child('notes').value.toString());
 
       });
     });
