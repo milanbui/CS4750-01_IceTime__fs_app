@@ -1,7 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../alert_dialog_functions.dart';
+import 'package:ice_time_fs_practice_log/Screens/SharpeningLogScreens/add_sharpening_log_screen.dart';
+import 'package:ice_time_fs_practice_log/Screens/SharpeningLogScreens/edit_sharpening_log_screen.dart';
+
+import 'PracticeLogScreens/edit_practice_log_screen.dart';
+
 
 class SharpeningLogScreen extends StatefulWidget {
   @override
@@ -9,9 +14,28 @@ class SharpeningLogScreen extends StatefulWidget {
 }
 
 class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
-
   bool _isEditMode = false;
-  String _date = "";
+  List _logsList =  [];
+  bool _progressController = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    String id =  FirebaseAuth.instance.currentUser!.uid;
+    List temp = [];
+    FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs").onValue.listen((DatabaseEvent event) {
+      setState(() {
+        _logsList = [];
+        for(DataSnapshot data in event.snapshot.children.toList()) {
+          _logsList.add(data.value);
+        }
+
+        _progressController = false;
+      });
+    });
+
+  }
 
   void _changeMode() {
     setState(() {
@@ -20,18 +44,9 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-
-
-    String id = FirebaseAuth.instance.currentUser!.uid;
-
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFC8DDFD),
+      backgroundColor: const Color(0xFFC8DDFD),
       body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -50,24 +65,55 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
                           color: const Color(0xFF454545),
                           focusColor: Colors.white,
                           onPressed: ()  {
-                            if(_isEditMode) {
-                              FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/").update(
-                                  {'date' : _date})
-                                  .then((value)  {
-
-                              }).catchError((error) {
-                                showErrorAlertDialog(context, error.toString());
-                              });
-                            }
-                            _changeMode();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => AddSharpeningLogScreen()));
                           },
                         ),
                       ),
                     ]
                 ),
-                Container(
-                  height: 300,
-                  width: 350,
+                Expanded(
+                  flex: 80,
+                  child: _progressController ?
+                  Container(
+                      margin: EdgeInsets.fromLTRB(10, 290, 10, 290),
+                      child: CircularProgressIndicator(color: Color(0xFF454545))
+                  ) :
+                  ListView.builder(
+                    itemCount: _logsList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => EditSharpeningLogScreen(_logsList[index]['date'].toString())));
+                          },
+                          child: Container(
+                              margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF98BEEB),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child:
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
+                                          child: Text("DATE: " + _logsList[index]['date'].toString())
+                                      ),
+                                      Container(
+                                          margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
+                                          child: Text("Notes: " + (_logsList[index]['notes'] == null ? "No Notes" : _logsList[index]['notes'].toString()))
+                                      ),
+                                    ],
+                                  ),
+                          )
+                      );
+                    },
+
+                  ),
                 )
               ]
           )

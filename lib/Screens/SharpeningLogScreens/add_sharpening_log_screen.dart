@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
-class AddPracticeLogScreen extends StatefulWidget {
+class AddSharpeningLogScreen extends StatefulWidget {
   @override
-  _AddPracticeLogScreenState createState() => _AddPracticeLogScreenState();
+  _AddSharpeningLogScreenState createState() => _AddSharpeningLogScreenState();
 }
 
-class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
+class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
 
   TextEditingController dateController = TextEditingController();
   TextEditingController hoursController = TextEditingController();
@@ -35,7 +35,7 @@ class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
                   padding: EdgeInsets.fromLTRB(0, 0, 325, 0),
                 ),
                 SizedBox(height: 50),
-                Text("Add Practice Log", style: TextStyle(color: Color(0xFF799FDA), fontWeight: FontWeight.bold, fontSize: 25)),
+                Text("Add Sharpening Log", style: TextStyle(color: Color(0xFF799FDA), fontWeight: FontWeight.bold, fontSize: 25)),
                 SizedBox(height: 25),
                 Container(
                   padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
@@ -56,24 +56,6 @@ class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
                           filled: true,
                           fillColor: Colors.white,
                           labelText: 'date',
-                          labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      TextField(
-                        controller: hoursController,
-                        obscureText: false,
-                        enabled: true,
-                        decoration: InputDecoration(
-                          border:
-                          OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          filled: true,
-                          fillColor: Colors.white,
-                          labelText: 'hours practiced',
                           labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
                         ),
                       ),
@@ -119,11 +101,10 @@ class _AddPracticeLogScreenState extends State<AddPracticeLogScreen> {
                   onPressed: () async {
                     var log = {
                       "date" : dateController.text,
-                      "hours" : hoursController.text,
                       "notes" : notesController.text,
                     };
 
-                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/logs/" + log['date'].toString()).set(log)
+                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + log['date'].toString()).set(log)
                          .then((value)  {
                           Navigator.pop(context);
 

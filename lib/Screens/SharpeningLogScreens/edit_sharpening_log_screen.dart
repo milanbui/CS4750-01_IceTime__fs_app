@@ -5,18 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../alert_dialog_functions.dart';
 
-class EditPracticeLogScreen extends StatefulWidget {
+class EditSharpeningLogScreen extends StatefulWidget {
   final String d;
-  EditPracticeLogScreen(this.d);
+  EditSharpeningLogScreen(this.d);
   @override
-  _EditPracticeLogScreenState createState() => _EditPracticeLogScreenState();
+  _EditSharpeningLogScreenState createState() => _EditSharpeningLogScreenState();
 }
 
-class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
+class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
   bool _isEditMode = false;
 
   TextEditingController _dateController = TextEditingController();
-  TextEditingController _hoursController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
 
   @override
@@ -24,10 +23,9 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
     super.initState();
 
     String id =  FirebaseAuth.instance.currentUser!.uid;
-    FirebaseDatabase.instance.ref("users/" + id + "/logs/" + widget.d).onValue.listen((DatabaseEvent event) {
+    FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs/" + widget.d).onValue.listen((DatabaseEvent event) {
       setState(() {
         _dateController = TextEditingController(text: event.snapshot.child('date').value.toString());
-        _hoursController = TextEditingController(text: event.snapshot.child('hours').value.toString());
         _notesController = TextEditingController(text: event.snapshot.child('notes').value.toString());
 
       });
@@ -45,7 +43,7 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFC8DDFD),
-      body: SingleChildScrollView(
+      body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
@@ -78,11 +76,10 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
                                   if(_isEditMode) {
                                     var log = {
                                       "date" : _dateController.text,
-                                      "hours" : _hoursController.text,
                                       "notes" : _notesController.text,
                                     };
 
-                                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/logs/" + log['date'].toString()).update(log)
+                                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + log['date'].toString()).update(log)
                                         .then((value)  {
 
                                     }).catchError((error) {
@@ -116,7 +113,7 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
                                             TextButton(
                                               child: Text("delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18)),
                                               onPressed: () {
-                                                FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/logs/" + _dateController.text).remove()
+                                                FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + _dateController.text).remove()
                                                 .then((value)  {
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
@@ -162,39 +159,6 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
                         margin: EdgeInsets.fromLTRB(5, 10, 15, 10),
                         child: TextField(
                           controller: _dateController,
-                          obscureText: false,
-                          enabled: _isEditMode,
-                          decoration: InputDecoration(
-                            border:
-                            OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            filled: true,
-                            fillColor: _isEditMode ? Colors.white : Color(0xFFC8DDFD),
-                            labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        flex: 20,
-                        child: Container(
-                            margin: EdgeInsets.fromLTRB(15, 10, 5, 10),
-                            child: Text("Hours: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))
-                        )
-                    ),
-                    Expanded(
-                      flex: 80,
-                      child: Container(
-                        margin: EdgeInsets.fromLTRB(5, 10, 15, 10),
-                        child: TextField(
-                          controller: _hoursController,
                           obscureText: false,
                           enabled: _isEditMode,
                           decoration: InputDecoration(
