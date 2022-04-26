@@ -112,16 +112,17 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                     AuthCredential credential = EmailAuthProvider.credential(
                         email: emailController.text,
                         password: passwordController.text);
+
                     FirebaseAuth.instance.currentUser!
-                        .reauthenticateWithCredential(credential)
-                        .then((value) {
-                      value.user!.updateEmail(newEmailController.text)
-                          .then((value) {
+                    .reauthenticateWithCredential(credential)
+                    .then((value) async {
+                      await FirebaseAuth.instance.currentUser!.updateEmail(newEmailController.text)
+                      .then((value) {
                         showSuccessAlertDialog(
                             context, "Your email has been updated.",
                             "account");
                       })
-                          .catchError((error) {
+                      .catchError((error) {
                         showErrorAlertDialog(context, error.toString());
                       });
                     })

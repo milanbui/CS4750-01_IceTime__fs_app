@@ -101,7 +101,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                         .reauthenticateWithCredential(credential)
                         .then((value) {
                           var id = FirebaseAuth.instance.currentUser!.uid;
-                          value.user!.delete()
+                          FirebaseAuth.instance.currentUser!.delete()
                           .then((value) {
 
                             FirebaseDatabase.instance.ref("users/" + id).remove()

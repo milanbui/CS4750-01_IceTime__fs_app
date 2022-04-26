@@ -134,7 +134,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       FirebaseAuth.instance.currentUser!
                           .reauthenticateWithCredential(credential)
                           .then((value) {
-                            value.user!.updatePassword(newPasswordController.text)
+                        FirebaseAuth.instance.currentUser!.updatePassword(newPasswordController.text)
                             .then((value) {
                               showSuccessAlertDialog(
                               context, "Your password has been updated.",

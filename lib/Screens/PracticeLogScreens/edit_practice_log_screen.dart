@@ -14,7 +14,6 @@ class EditPracticeLogScreen extends StatefulWidget {
 
 class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
   bool _isEditMode = false;
-  bool _progressController = true;
 
   TextEditingController _dateController = TextEditingController();
   TextEditingController _hoursController = TextEditingController();
@@ -36,7 +35,6 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
         _hoursController = TextEditingController(text: temp[1]);
         _notesController = TextEditingController(text: temp[2]);
 
-        _progressController = false;
       });
     });
 
@@ -125,6 +123,7 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
                                               onPressed: () {
                                                 FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/logs/" + _dateController.text).remove()
                                                 .then((value)  {
+                                                  Navigator.pop(context);
                                                   Navigator.pop(context);
                                                 }).catchError((error) {
                                                   showErrorAlertDialog(context, error.toString());
