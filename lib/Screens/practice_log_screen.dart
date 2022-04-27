@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/Screens/PracticeLogScreens/add_practice_log_screen.dart';
-
 import 'PracticeLogScreens/edit_practice_log_screen.dart';
 
 
@@ -29,6 +27,9 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
         for(DataSnapshot data in event.snapshot.children.toList()) {
           _logsList.add(data.value);
         }
+        _logsList.sort((a, b) {
+            return a['date'].compareTo(b['date']);
+        });
 
         _progressController = false;
       });
@@ -86,10 +87,10 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                           onTap: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => EditPracticeLogScreen(_logsList[index]['date'].toString())));
+                                MaterialPageRoute(builder: (context) => EditPracticeLogScreen(_logsList[index]['timeStamp'].toString())));
                           },
                           child: Container(
-                            margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                            margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                             decoration: const BoxDecoration(
                               color: Color(0xFF98BEEB),
                               borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -99,7 +100,26 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                             children: [
                               Container(
                                   margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
-                                  child: Text("DATE: " + _logsList[index]['date'].toString())
+                                  child: Text(
+                                      "DATE: "
+                                      + DateTime.fromMillisecondsSinceEpoch(
+                                          int.parse(
+                                              _logsList[index]['date'].toString()
+                                          )
+                                      ).toLocal().day.toString()
+                                      + " - "
+                                      + DateTime.fromMillisecondsSinceEpoch(
+                                          int.parse(
+                                              _logsList[index]['date'].toString()
+                                          )
+                                      ).toLocal().month.toString()
+                                      + " - "
+                                      + DateTime.fromMillisecondsSinceEpoch(
+                                          int.parse(
+                                              _logsList[index]['date'].toString()
+                                          )
+                                      ).toLocal().year.toString()
+                                  )
                               ),
                               Container(
                                   margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),

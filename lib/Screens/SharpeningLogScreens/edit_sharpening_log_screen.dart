@@ -14,9 +14,8 @@ class EditSharpeningLogScreen extends StatefulWidget {
 
 class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
   bool _isEditMode = false;
-
-  TextEditingController _dateController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -25,7 +24,7 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
     String id =  FirebaseAuth.instance.currentUser!.uid;
     FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs/" + widget.d).onValue.listen((DatabaseEvent event) {
       setState(() {
-        _dateController = TextEditingController(text: event.snapshot.child('date').value.toString());
+        _selectedDate = DateTime.fromMillisecondsSinceEpoch(int.parse(event.snapshot.child('date').value.toString()));
         _notesController = TextEditingController(text: event.snapshot.child('notes').value.toString());
 
       });
@@ -75,11 +74,11 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
                                 onPressed: () {
                                   if(_isEditMode) {
                                     var log = {
-                                      "date" : _dateController.text,
+                                      "date" : _selectedDate.millisecondsSinceEpoch,
                                       "notes" : _notesController.text,
                                     };
 
-                                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + log['date'].toString()).update(log)
+                                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + widget.d).update(log)
                                         .then((value)  {
 
                                     }).catchError((error) {
@@ -113,7 +112,7 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
                                             TextButton(
                                               child: Text("delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18)),
                                               onPressed: () {
-                                                FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + _dateController.text).remove()
+                                                FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + widget.d).remove()
                                                 .then((value)  {
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
@@ -147,30 +146,60 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
                 Row(
                   children: [
                     Expanded(
-                        flex: 20,
+                        flex: 15,
                         child: Container(
-                            margin: EdgeInsets.fromLTRB(15, 10, 5, 10),
+                            margin: EdgeInsets.fromLTRB(15, 10, 0, 10),
                             child: Text("Date: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))
                         )
                     ),
                     Expanded(
-                      flex: 80,
-                      child: Container(
-                        margin: EdgeInsets.fromLTRB(5, 10, 15, 10),
-                        child: TextField(
-                          controller: _dateController,
-                          obscureText: false,
-                          enabled: _isEditMode,
-                          decoration: InputDecoration(
-                            border:
-                            OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                              borderSide: BorderSide.none,
+                      flex: 26,
+                      child:
+                      Container(
+                        height: 50,
+                        padding: EdgeInsets.fromLTRB(20, 18, 20, 0),
+                        margin: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+                        decoration: BoxDecoration(
+                          color: _isEditMode ? Colors.white : Color(0xFFC8DDFD),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        child: Text(
+                            _selectedDate.toLocal().day.toString() + " - "
+                                + _selectedDate.toLocal().month.toString() + " - "
+                                + _selectedDate.toLocal().year.toString(),
+                            style: TextStyle(fontSize: 16)
+                        ),
+                      ),
+                    ),
+                    Expanded (
+                      flex: 28,
+                      child: Visibility(
+                        visible: _isEditMode,
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(0, 0, 15, 10),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary: Color(0xFF799FDA),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                                fixedSize: Size(40, 35)
                             ),
-                            contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                            filled: true,
-                            fillColor: _isEditMode ? Colors.white : Color(0xFFC8DDFD),
-                            labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
+                            child: Text("select date", style: TextStyle(fontSize: 15)),
+                            onPressed: () async {
+                              DateTime? selected = await showDatePicker(
+                                context: context,
+                                initialDate: _selectedDate,
+                                firstDate: DateTime(2010),
+                                lastDate: DateTime(2050),
+
+                              );
+
+                              if (selected != null && selected != _selectedDate) {
+                                setState(() {
+                                  _selectedDate = selected;
+                                });
+                              }
+                            },
                           ),
                         ),
                       ),
@@ -183,7 +212,7 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
                     Expanded(
                         flex: 20,
                         child: Container(
-                            margin: EdgeInsets.fromLTRB(15, 10, 5, 10),
+                            margin: EdgeInsets.fromLTRB(15, 20, 5, 10),
                             child: Text("Notes: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))
                         )
                     ),

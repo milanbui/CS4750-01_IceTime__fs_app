@@ -5,9 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ice_time_fs_practice_log/Screens/SharpeningLogScreens/add_sharpening_log_screen.dart';
 import 'package:ice_time_fs_practice_log/Screens/SharpeningLogScreens/edit_sharpening_log_screen.dart';
 
-import 'PracticeLogScreens/edit_practice_log_screen.dart';
-
-
 class SharpeningLogScreen extends StatefulWidget {
   @override
   _SharpeningLogScreenState createState() => _SharpeningLogScreenState();
@@ -87,9 +84,10 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
                           onTap: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => EditSharpeningLogScreen(_logsList[index]['date'].toString())));
+                                MaterialPageRoute(builder: (context) => EditSharpeningLogScreen(_logsList[index]['timeStamp'].toString())));
                           },
                           child: Container(
+                              padding: EdgeInsets.fromLTRB(5, 5, 5, 10),
                               margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                               decoration: const BoxDecoration(
                                 color: Color(0xFF98BEEB),
@@ -101,7 +99,26 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
                                     children: [
                                       Container(
                                           margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
-                                          child: Text("DATE: " + _logsList[index]['date'].toString())
+                                          child: Text(
+                                              "DATE: "
+                                                  + DateTime.fromMillisecondsSinceEpoch(
+                                                  int.parse(
+                                                      _logsList[index]['date'].toString()
+                                                  )
+                                              ).toLocal().day.toString()
+                                                  + " - "
+                                                  + DateTime.fromMillisecondsSinceEpoch(
+                                                  int.parse(
+                                                      _logsList[index]['date'].toString()
+                                                  )
+                                              ).toLocal().month.toString()
+                                                  + " - "
+                                                  + DateTime.fromMillisecondsSinceEpoch(
+                                                  int.parse(
+                                                      _logsList[index]['date'].toString()
+                                                  )
+                                              ).toLocal().year.toString()
+                                          )
                                       ),
                                       Container(
                                           margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),

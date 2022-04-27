@@ -9,11 +9,11 @@ class AddSharpeningLogScreen extends StatefulWidget {
 
 class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
 
-  TextEditingController dateController = TextEditingController();
   TextEditingController hoursController = TextEditingController();
   TextEditingController notesController = TextEditingController();
   User? user = FirebaseAuth.instance.currentUser;
 
+  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -37,56 +37,78 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                 SizedBox(height: 50),
                 Text("Add Sharpening Log", style: TextStyle(color: Color(0xFF799FDA), fontWeight: FontWeight.bold, fontSize: 25)),
                 SizedBox(height: 25),
-                Container(
-                  padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: dateController,
-                        obscureText: false,
-                        enabled: true,
-                        decoration: InputDecoration(
-                          border:
-                          OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          filled: true,
-                          fillColor: Colors.white,
-                          labelText: 'date',
-                          labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
-                        ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  //mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 140,
+                      padding: EdgeInsets.fromLTRB(20, 18, 20, 0),
+                      margin: const EdgeInsets.fromLTRB(25, 0, 10, 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
-                      SizedBox(height: 10),
-                      IntrinsicHeight(
-                        child: Container(
-                          child: TextField(
-                            textAlignVertical: TextAlignVertical.top,
-                            minLines: null,
-                            maxLines: null,
-                            expands: true,
-                            controller: notesController,
-                            obscureText: false,
-                            enabled: true,
-                            decoration: InputDecoration(
-                              border:
-                              OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: 'notes',
-                              alignLabelWithHint: true,
-                              labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
-                            ),
-                          ),
-                        ),
+                      child: Text(
+                          _selectedDate.toLocal().day.toString() + " - "
+                              + _selectedDate.toLocal().month.toString() + " - "
+                              + _selectedDate.toLocal().year.toString(),
+                          style: TextStyle(fontSize: 16)
                       ),
-                    ],
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF799FDA),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                        fixedSize: Size(190, 35),
+                      ),
+                      child: Text("select date", style: TextStyle(fontSize: 18)),
+                      onPressed: () async {
+                        DateTime? selected = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedDate,
+                          firstDate: DateTime(2010),
+                          lastDate: DateTime(2050),
+
+                        );
+
+                        if (selected != null && selected != _selectedDate) {
+                          setState(() {
+                            _selectedDate = selected;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                IntrinsicHeight(
+                  child: Container(
+                    margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
+                    child: TextField(
+                      textAlignVertical: TextAlignVertical.top,
+                      minLines: null,
+                      maxLines: null,
+                      expands: true,
+                      controller: notesController,
+                      obscureText: false,
+                      enabled: true,
+                      decoration: InputDecoration(
+                        border:
+                        OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                        filled: true,
+                        fillColor: Colors.white,
+                        labelText: 'notes',
+                        alignLabelWithHint: true,
+                        labelStyle: TextStyle(fontSize: 18, color: Color(0xFF7C7C7C)),
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -100,11 +122,12 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                   child: Text("done", style: TextStyle(fontSize: 18)),
                   onPressed: () async {
                     var log = {
-                      "date" : dateController.text,
+                      "timeStamp" : DateTime.now().millisecondsSinceEpoch.toString(),
+                      "date" : _selectedDate.millisecondsSinceEpoch,
                       "notes" : notesController.text,
                     };
 
-                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + log['date'].toString()).set(log)
+                    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + log['timeStamp'].toString()).set(log)
                          .then((value)  {
                           Navigator.pop(context);
 

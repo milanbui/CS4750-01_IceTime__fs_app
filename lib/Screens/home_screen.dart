@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _logDate = "";
   String _logHours = "";
   String _logNotes = "";
+  bool _progressController = true;
 
   void _changeMode() {
     setState(() {
@@ -29,15 +30,27 @@ class _HomeScreenState extends State<HomeScreen> {
     String id = FirebaseAuth.instance.currentUser!.uid;
     FirebaseDatabase.instance .ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
       setState(() {
-        _logDate = event.snapshot.children.last.child('date').value.toString();
-        _logHours = event.snapshot.children.last.child('hours').value.toString();
-        _logNotes = event.snapshot.children.last.child('notes').value.toString();
+
+        var logsList = [];
+        for(DataSnapshot data in event.snapshot.children.toList()) {
+          logsList.add(data.value);
+        }
+        logsList.sort((a, b) {
+          return a['date'].compareTo(b['date']);
+        });
+        _logDate = logsList.last['date'].toString();
+        _logHours = logsList.last['hours'].toString().toString();
+        _logNotes = logsList.last['notes'].toString().toString();
+
+        _progressController = false;
       });
     });
 
     FirebaseDatabase.instance .ref("users/" + id + "/goal").onValue.listen((DatabaseEvent event) {
       setState(() {
         _goalController = TextEditingController(text: event.snapshot.value.toString());
+
+        _progressController = false;
       });
     });
   }
@@ -96,7 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                             width: 50,
                             height: 100,
-                            child:
+                            child: _progressController ?
+                            SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: CircularProgressIndicator(color: Color(0xFF454545),)
+                            ) :
                             TextField(
                               style: TextStyle(color: Color(0xFF454545)),
                               controller: _goalController,
@@ -129,8 +147,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text("Hours Practiced This Week  : ",
                               style: TextStyle(
                                   fontSize: 12, color: Color(0xFF454545))),
+                          ( _progressController ?
+                          SizedBox(
+                              height: 15,
+                              width: 15,
+                              child: CircularProgressIndicator(color: Color(0xFF454545),)
+                          ) :
                           Text(_hoursPracticed.toString(),
-                              style: TextStyle(color: Color(0xFF454545))),
+                              style: TextStyle(color: Color(0xFF454545)))
+                          ),
                         ],
                       ),
                     )
@@ -150,8 +175,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text("Hours Until Next Sharpening: ",
                               style: TextStyle(
                                   fontSize: 12, color: Color(0xFF454545))),
-                          Text(_hoursLeft.toString(),
-                              style: TextStyle(color: Color(0xFF454545))),
+                          (_progressController ?
+                          SizedBox(
+                              height: 15,
+                              width: 15,
+                              child: CircularProgressIndicator(color: Color(0xFF454545),)
+                          ) :Text(_hoursLeft.toString(),
+                              style: TextStyle(color: Color(0xFF454545)))
+                          ),
                         ],
                       ),
                     )
@@ -175,9 +206,31 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text("DATE: ",
                                     style: TextStyle(fontWeight: FontWeight
-                                        .bold, color: Color(0xFF454545))),
-                                Text(_logDate, style: TextStyle(color: Color(
-                                    0xFF454545)))
+                                    .bold, color: Color(0xFF454545))
+                                ),
+                                (_progressController ?
+                                  SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(color: Color(0xFF454545),)
+                                  ) :
+                                  Text(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                        int.parse(_logDate.toString())
+                                      ).toLocal().day.toString()
+                                      + " - "
+                                      + DateTime.fromMillisecondsSinceEpoch(
+                                        int.parse(_logDate.toString())
+                                      ).toLocal().month.toString()
+                                      + " - "
+                                      + DateTime.fromMillisecondsSinceEpoch(
+                                        int.parse(
+                                            _logDate.toString()
+                                        )
+                                      ).toLocal().year.toString(),
+                                      style: TextStyle(color: Color(0xFF454545))
+                                  )
+                                )
                               ],
                             )
                         ),
@@ -188,9 +241,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text("HOURS: ",
                                     style: TextStyle(fontWeight: FontWeight
                                         .bold, color: Color(0xFF454545))),
+
+                            (_progressController ?
+                                SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: CircularProgressIndicator(color: Color(0xFF454545),)
+                                ) :
                                 Text(_logHours +
-                                    (_logHours == 1 ? "hr" : " hrs"),
-                                    style: TextStyle(color: Color(0xFF454545))),
+                                        (_logHours == 1 ? "hr" : " hrs"),
+                                        style: TextStyle(color: Color(0xFF454545)))
+                                ),
                               ],
                             )
                         ),
@@ -204,8 +265,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           constraints: BoxConstraints(maxHeight: 320),
                           margin: const EdgeInsets.fromLTRB(15, 2, 15, 15),
-                          child: Text(_logNotes,
-                              style: TextStyle(color: Color(0xFF454545))),
+                          child: (_progressController ?
+                          SizedBox(
+                              height: 15,
+                              width: 15,
+                              child: CircularProgressIndicator(color: Color(0xFF454545),)
+                          ) :
+                          Text(_logNotes,
+                              style: TextStyle(color: Color(0xFF454545)))
+                          ),
                         ),
                       ],
                     )
