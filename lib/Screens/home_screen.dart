@@ -31,6 +31,31 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     String id = FirebaseAuth.instance.currentUser!.uid;
 
+    List temp = [];
+    FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs").onValue.listen((DatabaseEvent event) {
+      setState(() {
+
+        if(event.snapshot.value == null) {
+          FirebaseDatabase.instance.ref("users/" + id + "/lastSharpenDate").remove();
+          _progressController = false;
+        }
+        else {
+          for(DataSnapshot data in event.snapshot.children.toList()) {
+            temp.add(data.value);
+          }
+
+          temp.sort((a, b) {
+            return a['date'].compareTo(b['date']);
+          });
+
+          FirebaseDatabase.instance.ref("users/" + id).update({'lastSharpenDate' : temp.last['date']});
+
+
+          _progressController = false;
+
+        }
+      });
+    });
 
 
     FirebaseDatabase.instance .ref("users/" + id + "/goal").onValue.listen((DatabaseEvent event) {

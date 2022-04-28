@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../alert_dialog_functions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PlanScreen extends StatefulWidget {
   @override
@@ -41,6 +41,12 @@ class _PlanScreenState extends State<PlanScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    var _url = Uri.parse('https://online.flippingbook.com/view/375134/');
+    void _launchUrl() async {
+      if (!await launchUrl(_url)) throw 'Could not launch $_url';
+    }
+
     return Scaffold(
       backgroundColor: Color(0xFFC8DDFD),
       body: SingleChildScrollView(
@@ -79,8 +85,8 @@ class _PlanScreenState extends State<PlanScreen> {
                           ),
                         ]
                     ),
-
-                    Text('Warm Up Plan'),
+                    SizedBox(height: 15),
+                    Text('Warm Up Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     IntrinsicHeight(
                       child: Container(
                         margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -110,7 +116,7 @@ class _PlanScreenState extends State<PlanScreen> {
                               ),
                     ),
                     SizedBox(height: 20),
-                    Text('Practice Plan'),
+                    Text('Practice Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     IntrinsicHeight(
                       child: Container(
                         margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -142,8 +148,7 @@ class _PlanScreenState extends State<PlanScreen> {
                     SizedBox(height: 15),
                     TextButton(
                             child: Text("Testing Resources", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF454545))),
-                            onPressed: () {
-                            },
+                            onPressed: _launchUrl,
                           ),
                   ]
               )
