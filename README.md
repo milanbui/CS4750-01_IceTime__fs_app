@@ -1,16 +1,12 @@
+# Ice Time App
+# A figure skating practice log app
 # ice_time_fs_practice_log
 
-A new Flutter project.
+This is a figure skating practice log mobile app built using Flutter in Android Studio for a class project.
+The app can be found on the google play store.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This app has several features:
+- planning practices
+- logging practices
+- logging skate sharpening dates
+- setting a weekly practice goal
