@@ -12,8 +12,8 @@ class PlanScreen extends StatefulWidget {
 
 class _PlanScreenState extends State<PlanScreen> {
   bool _isEditMode = false;
-  TextEditingController warmUpPlanController = TextEditingController();
-  TextEditingController practicePlanController = TextEditingController();
+  TextEditingController warmUpPlanController = TextEditingController(text: "");
+  TextEditingController practicePlanController = TextEditingController(text: "");
 
   void _changeMode() {
     setState(() {

@@ -114,6 +114,7 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
                                               onPressed: () {
                                                 FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + widget.d).remove()
                                                 .then((value)  {
+
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
                                                 }).catchError((error) {

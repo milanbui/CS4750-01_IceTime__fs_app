@@ -24,11 +24,27 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
     FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs").onValue.listen((DatabaseEvent event) {
       setState(() {
         _logsList = [];
-        for(DataSnapshot data in event.snapshot.children.toList()) {
-          _logsList.add(data.value);
+        if(event.snapshot.value == null) {
+          FirebaseDatabase.instance.ref("users/" + id + "/lastSharpenDate").remove();
+          _progressController = false;
         }
+        else {
+          for(DataSnapshot data in event.snapshot.children.toList()) {
+            _logsList.add(data.value);
+          }
 
-        _progressController = false;
+          List temp = List.from(_logsList);
+
+          temp.sort((a, b) {
+            return a['date'].compareTo(b['date']);
+          });
+
+          FirebaseDatabase.instance.ref("users/" + id).update({'lastSharpenDate' : temp.last['date']});
+
+
+          _progressController = false;
+
+        }
       });
     });
 

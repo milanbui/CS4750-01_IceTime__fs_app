@@ -12,46 +12,103 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isEditMode = false;
   TextEditingController _goalController = TextEditingController();
   int _hoursPracticed = 0;
-  int _hoursLeft = 0;
+  int _hoursLeft = 50;
+  int _lastSharpenDate = -1;
   String _logDate = "";
   String _logHours = "";
   String _logNotes = "";
   bool _progressController = true;
+
 
   void _changeMode() {
     setState(() {
       _isEditMode = !_isEditMode;
     });
   }
+
   @override
   void initState() {
     super.initState();
-
     String id = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseDatabase.instance .ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
-      setState(() {
 
-        var logsList = [];
-        for(DataSnapshot data in event.snapshot.children.toList()) {
-          logsList.add(data.value);
-        }
-        logsList.sort((a, b) {
-          return a['date'].compareTo(b['date']);
-        });
-        _logDate = logsList.last['date'].toString();
-        _logHours = logsList.last['hours'].toString().toString();
-        _logNotes = logsList.last['notes'].toString().toString();
 
-        _progressController = false;
-      });
-    });
 
     FirebaseDatabase.instance .ref("users/" + id + "/goal").onValue.listen((DatabaseEvent event) {
-      setState(() {
-        _goalController = TextEditingController(text: event.snapshot.value.toString());
+      if(event.snapshot.value != null) {
+        setState(() {
+          _goalController =
+              TextEditingController(text: event.snapshot.value.toString());
 
-        _progressController = false;
-      });
+          _progressController = false;
+        });
+      }
+      else {
+        setState(() {
+          _progressController = false;
+        });
+      }
+    });
+
+    FirebaseDatabase.instance .ref("users/" + id + "/lastSharpenDate").onValue.listen((DatabaseEvent event) {
+      if (event.snapshot.value != null) {
+        setState(() {
+          print(int.tryParse(event.snapshot.value.toString()));
+          _lastSharpenDate = int.parse(event.snapshot.value.toString());
+
+          _progressController = false;
+        });
+      }
+      else {
+        setState(() {
+          _progressController = false;
+        });
+      }
+    });
+
+    FirebaseDatabase.instance .ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
+      if (event.snapshot.value != null) {
+        setState(()  {
+          DateTime date = DateTime.now();
+          DateTime firstDayOfWeek = DateTime(date.year, date.month, date.day - date.weekday % 7);
+          _hoursPracticed = 0;
+          int hours = 0;
+          var logsList = [];
+
+          for(DataSnapshot data in event.snapshot.children.toList()) {
+
+            logsList.add(data.value);
+            DateTime compareDate = DateTime.fromMillisecondsSinceEpoch(int.parse(data.child('date').value.toString()));
+            if((compareDate.isAfter(firstDayOfWeek) || compareDate.isAtSameMomentAs(firstDayOfWeek)) && compareDate.isBefore(date)) {
+              _hoursPracticed += int.parse(data.child('hours').value.toString());
+            }
+
+            if(_lastSharpenDate != -1
+                && (compareDate.isAfter(DateTime.fromMillisecondsSinceEpoch(_lastSharpenDate))
+                || compareDate.isAtSameMomentAs(DateTime.fromMillisecondsSinceEpoch(_lastSharpenDate)))) {
+              hours += int.parse(data.child('hours').value.toString());
+            }
+
+          }
+          logsList.sort((a, b) {
+            return a['date'].compareTo(b['date']);
+          });
+
+          _logDate = logsList.last['date'].toString();
+          _logHours = logsList.last['hours'].toString();
+          _logNotes = logsList.last['notes'].toString();
+
+          if (_lastSharpenDate != -1) {
+            _hoursLeft = 30 - hours;
+          }
+          print(_hoursLeft.toString() + " | " + hours.toString() + " | " + _lastSharpenDate.toString());
+          _progressController = false;
+        });
+      }
+      else {
+        setState(() {
+          _progressController = false;
+        });
+      }
     });
   }
 
@@ -75,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         margin: const EdgeInsets.fromLTRB(0, 25, 0, 5),
                         child: IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: _isEditMode ? Icon(Icons.done) : Icon(Icons.edit),
                           color: const Color(0xFF454545),
                           focusColor: Colors.white,
                           onPressed: () {
@@ -107,14 +164,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text("Weekly Practice Hour Goal: ", style: TextStyle(
                             fontSize: 12, color: Color(0xFF454545))),
                         SizedBox(
-                            width: 50,
-                            height: 100,
+                            width: _progressController? 15 : 50,
+                            height: _progressController? 15 : 100,
                             child: _progressController ?
-                            SizedBox(
-                                height: 15,
-                                width: 15,
-                                child: CircularProgressIndicator(color: Color(0xFF454545),)
-                            ) :
+                            CircularProgressIndicator(color: Color(0xFF454545),)
+                             :
                             TextField(
                               style: TextStyle(color: Color(0xFF454545)),
                               controller: _goalController,
@@ -154,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: CircularProgressIndicator(color: Color(0xFF454545),)
                           ) :
                           Text(_hoursPracticed.toString(),
-                              style: TextStyle(color: Color(0xFF454545)))
+                              style: TextStyle(color: Color(0xFF454545), fontSize: 18))
                           ),
                         ],
                       ),
@@ -175,16 +229,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text("Hours Until Next Sharpening: ",
                               style: TextStyle(
                                   fontSize: 12, color: Color(0xFF454545))),
-                          (_progressController ?
-                          SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: CircularProgressIndicator(color: Color(0xFF454545),)
-                          ) :Text(_hoursLeft.toString(),
-                              style: TextStyle(color: Color(0xFF454545)))
+                              (_progressController?
+                              SizedBox(
+                                  height: 15,
+                                  width: 15,
+                                  child: CircularProgressIndicator(color: Color(0xFF454545),)
+                              ) :
+                              (_hoursLeft == 50 ? Text("-") :
+                              Text(_hoursLeft <= 0 ? "TIME TO SHARPEN!" : _hoursLeft.toString(),
+                                  style: TextStyle(color: Color(0xFF454545), fontSize: _hoursLeft <= 0 ? 12: 18))
+                              )),
+                            ],
                           ),
-                        ],
-                      ),
                     )
                 ),
                 SizedBox(height: 15),
@@ -214,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: 15,
                                       child: CircularProgressIndicator(color: Color(0xFF454545),)
                                   ) :
-                                  Text(
+                                  Text( _logDate == "" ? " - " :
                                       DateTime.fromMillisecondsSinceEpoch(
                                         int.parse(_logDate.toString())
                                       ).toLocal().day.toString()
@@ -248,9 +304,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     width: 15,
                                     child: CircularProgressIndicator(color: Color(0xFF454545),)
                                 ) :
-                                Text(_logHours +
-                                        (_logHours == 1 ? "hr" : " hrs"),
-                                        style: TextStyle(color: Color(0xFF454545)))
+                                Text( _logHours == "" ? " - " :
+                                    _logHours
+                                    + (_logHours == 1 ? "hr" : " hrs"),
+                                    style: TextStyle(color: Color(0xFF454545)))
                                 ),
                               ],
                             )
@@ -271,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 15,
                               child: CircularProgressIndicator(color: Color(0xFF454545),)
                           ) :
-                          Text(_logNotes,
+                          Text( _logNotes == "" ? " - " : _logNotes,
                               style: TextStyle(color: Color(0xFF454545)))
                           ),
                         ),

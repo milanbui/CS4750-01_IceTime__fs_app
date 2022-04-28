@@ -15,7 +15,6 @@ class EditPracticeLogScreen extends StatefulWidget {
 class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
   bool _isEditMode = false;
 
-  TextEditingController _hoursController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now();
@@ -29,7 +28,7 @@ class _EditPracticeLogScreenState extends State<EditPracticeLogScreen> {
     FirebaseDatabase.instance.ref("users/" + id + "/logs/" + widget.d).onValue.listen((DatabaseEvent event) {
       setState(() {
         _selectedDate = DateTime.fromMillisecondsSinceEpoch(int.parse(event.snapshot.child('date').value.toString()));
-        _hoursController = TextEditingController(text: event.snapshot.child('hours').value.toString());
+        _selectedNumber = int.parse(event.snapshot.child('hours').value.toString());
         _notesController = TextEditingController(text: event.snapshot.child('notes').value.toString());
 
       });
