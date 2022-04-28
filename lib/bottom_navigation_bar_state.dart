@@ -13,7 +13,7 @@ class BottomNavBarState extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBarState> {
 
-  int _selectedIndex = 2;
+  int _selectedIndex = 2;  // starts on home screen
 
   static List<Widget> _widgetOptions = <Widget>[
     PlanScreen(),

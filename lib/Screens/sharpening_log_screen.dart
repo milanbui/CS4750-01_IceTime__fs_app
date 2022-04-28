@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +10,7 @@ class SharpeningLogScreen extends StatefulWidget {
 }
 
 class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
-  bool _isEditMode = false;
+
   List _logsList =  [];
   bool _progressController = true;
 
@@ -20,26 +19,30 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
     super.initState();
 
     String id =  FirebaseAuth.instance.currentUser!.uid;
-    List temp = [];
+    // SHARPENING LOG LISTENER
     FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs").onValue.listen((DatabaseEvent event) {
       setState(() {
         _logsList = [];
+        // IF logs dont exist, delete last sharpen date
         if(event.snapshot.value == null) {
           FirebaseDatabase.instance.ref("users/" + id + "/lastSharpenDate").remove();
           _progressController = false;
         }
+        // If logs exist
         else {
+
+          // Adds logs to local list
           for(DataSnapshot data in event.snapshot.children.toList()) {
             _logsList.add(data.value);
           }
 
-          List temp = List.from(_logsList);
-
-          temp.sort((a, b) {
+          // sorts  in ascending order by date
+          _logsList.sort((a, b) {
             return a['date'].compareTo(b['date']);
           });
 
-          FirebaseDatabase.instance.ref("users/" + id).update({'lastSharpenDate' : temp.last['date']});
+          // saves last sharpen date
+          FirebaseDatabase.instance.ref("users/" + id).update({'lastSharpenDate' : _logsList.last['date']});
 
 
           _progressController = false;
@@ -50,12 +53,6 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
 
   }
 
-  void _changeMode() {
-    setState(() {
-      _isEditMode = !_isEditMode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,6 +61,7 @@ class _SharpeningLogScreenState extends State<SharpeningLogScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+               // Top bar: logo and add button
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[

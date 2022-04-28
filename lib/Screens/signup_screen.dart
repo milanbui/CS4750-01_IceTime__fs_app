@@ -31,7 +31,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   flex: (MediaQuery.of(context).viewInsets.bottom == 0) ? 40 : 20,
                   child: Image.asset('assets/images/logo_image.png', height:200, width: 200)
               ),
-              Expanded(
+              Expanded( // MAIN SECTION
+                // If keyboard is not open, 50 , else 60
                 flex: (MediaQuery.of(context).viewInsets.bottom == 0) ? 50 : 60,
                 child: Container(
                   padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
@@ -129,13 +130,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 // If successfully created in firebase authenticate
                                 .then((authResult) {
 
+                                  // if user created
                                   if(authResult.user != null) {
 
                                     var profile = {
                                       "uid" : authResult.user!.uid,
-                                      "name" : nameController.text == "" ? "First Last" : nameController.text
+                                      "name" : nameController.text == ""
+                                               ? "First Last"
+                                               : nameController.text
                                     };
 
+                                    // add profile to firebase realtime database
                                     FirebaseDatabase.instance.ref("users/"+ authResult.user!.uid).set(profile)
                                         .then((value) {
                                       showSuccessAlertDialog(context, "Congratulations, your account has been successfully created.", "sign up");

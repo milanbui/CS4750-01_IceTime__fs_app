@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,38 +10,52 @@ class PlanScreen extends StatefulWidget {
 }
 
 class _PlanScreenState extends State<PlanScreen> {
+
   bool _isEditMode = false;
   TextEditingController warmUpPlanController = TextEditingController(text: "");
   TextEditingController practicePlanController = TextEditingController(text: "");
 
+  // toggles edit mode using edit icon
   void _changeMode() {
     setState(() {
       _isEditMode = !_isEditMode;
     });
   }
 
+  /*****************************************************************************
+   * initState
+   * Initializes state. Has several listeners: FirbaseDatabase listeners for
+   * sharpening logs, last sharpen date, practice logs, and goals.
+   ****************************************************************************/
   @override
   void initState() {
     super.initState();
 
+    String id = FirebaseAuth.instance.currentUser!.uid; // current user id
 
-    String id = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseDatabase.instance
-        .ref("users/" + id + "/plans")
-        .onValue
+    // Practice plan listener
+    FirebaseDatabase.instance.ref("users/" + id + "/plans").onValue
         .listen((DatabaseEvent event) {
-      setState(() {
+      // if plans exist, load
+      if (event.snapshot.exists) {
+        setState(() {
+          warmUpPlanController = TextEditingController(
+              text: event.snapshot.child('warmUpPlan').value.toString());
 
-        warmUpPlanController = TextEditingController(text: event.snapshot.child('warmUpPlan').value.toString());
-        practicePlanController = TextEditingController(text: event.snapshot.child('practicePlan').value.toString());
-      });
+          practicePlanController = TextEditingController(
+              text: event.snapshot.child('practicePlan').value.toString());
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
 
+    // url to us figure skating rulebook
     var _url = Uri.parse('https://online.flippingbook.com/view/375134/');
+
+    // launches url
     void _launchUrl() async {
       if (!await launchUrl(_url)) throw 'Could not launch $_url';
     }
@@ -53,6 +66,7 @@ class _PlanScreenState extends State<PlanScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
+                    // top bar with logo and edit button
                     Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
@@ -60,19 +74,23 @@ class _PlanScreenState extends State<PlanScreen> {
                             margin: const EdgeInsets.fromLTRB(150, 25, 100, 5),
                             child: Image.asset('assets/images/logo_image.png', height:60, width: 60),
                           ),
-                          Container(
+                          Container( // edit button
                             margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
                             child: IconButton(
                               icon: _isEditMode ? Icon(Icons.done) : Icon(Icons.edit),
                               color: Color(0xFF454545),
                               focusColor: Colors.white,
                               onPressed: () {
+
+                                // saves plans if toggling out of edit mode
                                 if(_isEditMode) {
                                   var plans = {
                                     'warmUpPlan' : warmUpPlanController.text,
                                     'practicePlan' : practicePlanController.text
                                   };
-                                  FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/plans/").update(plans)
+                                  FirebaseDatabase.instance.ref("users/"
+                                      + FirebaseAuth.instance.currentUser!.uid
+                                      + "/plans/").update(plans)
                                       .then((value)  {
 
                                   }).catchError((error) {
@@ -87,7 +105,7 @@ class _PlanScreenState extends State<PlanScreen> {
                     ),
                     SizedBox(height: 15),
                     Text('Warm Up Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    IntrinsicHeight(
+                    IntrinsicHeight( // conatiner height matched text field height
                       child: Container(
                         margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         decoration: BoxDecoration(
@@ -117,7 +135,7 @@ class _PlanScreenState extends State<PlanScreen> {
                     ),
                     SizedBox(height: 20),
                     Text('Practice Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    IntrinsicHeight(
+                    IntrinsicHeight(  // so container height matches text field height
                       child: Container(
                         margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         decoration: BoxDecoration(
@@ -128,8 +146,8 @@ class _PlanScreenState extends State<PlanScreen> {
                           controller: practicePlanController,
                           obscureText: false,
                           enabled: _isEditMode,
-                          minLines: null,
-                          maxLines: null,
+                          minLines: null,  // allows for expanding
+                          maxLines: null,  // allows for expanding
                           expands: true,
                           decoration: InputDecoration(
                             border:

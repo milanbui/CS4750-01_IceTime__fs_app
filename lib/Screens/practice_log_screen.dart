@@ -11,22 +11,29 @@ class PracticeLogScreen extends StatefulWidget {
 }
 
 class _PracticeLogScreenState extends State<PracticeLogScreen> {
-  bool _isEditMode = false;
+
   List _logsList =  [];
   bool _progressController = true;
 
+  // Initializes variables based on listeners
   @override
   void initState() {
     super.initState();
 
     String id =  FirebaseAuth.instance.currentUser!.uid;
     List temp = [];
+
+    // practice log listener
     FirebaseDatabase.instance.ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
       setState(() {
         _logsList = [];
+
+        // add list to logs list
         for(DataSnapshot data in event.snapshot.children.toList()) {
           _logsList.add(data.value);
         }
+
+        // sorts in ascending order
         _logsList.sort((a, b) {
             return a['date'].compareTo(b['date']);
         });
@@ -37,12 +44,6 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
 
   }
 
-  void _changeMode() {
-    setState(() {
-      _isEditMode = !_isEditMode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +52,7 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Row(
+                Row( // top bar with logo and add button
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Container(
@@ -65,6 +66,7 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                           color: const Color(0xFF454545),
                           focusColor: Colors.white,
                           onPressed: ()  {
+                            // navigates to add practice screen
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => AddPracticeLogScreen()));
@@ -73,23 +75,26 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                       ),
                     ]
                 ),
-                Expanded(
+                Expanded( // LIST SECTIONS
                   flex: 80,
                   child: _progressController ?
                   Container(
                       margin: EdgeInsets.fromLTRB(10, 290, 10, 290),
                       child: CircularProgressIndicator(color: Color(0xFF454545))
                   ) :
-                  ListView.builder(
+                  ListView.builder( // list of practice logs
                     itemCount: _logsList.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return InkWell(
+                      return InkWell( // makes container clickable
                           onTap: () {
+                            // navigates to edit page when container/log clicked
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => EditPracticeLogScreen(_logsList[index]['timeStamp'].toString())));
+                                MaterialPageRoute(builder: (context) =>
+                                    EditPracticeLogScreen(
+                                        _logsList[index]['timeStamp'].toString())));
                           },
-                          child: Container(
+                          child: Container(  // creates deep blue container to hold log
                             margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                             decoration: const BoxDecoration(
                               color: Color(0xFF98BEEB),
@@ -98,6 +103,8 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // displays date in local time zone in format
+                              // day - month - year
                               Container(
                                   margin: const EdgeInsets.fromLTRB(15, 15, 15, 5),
                                   child: Text(
@@ -121,12 +128,14 @@ class _PracticeLogScreenState extends State<PracticeLogScreen> {
                                       ).toLocal().year.toString()
                                   )
                               ),
+                              // Hours
                               Container(
                                   margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
                                   child: Text(
                                       "HOURS: " + _logsList[index]['hours'].toString() + (_logsList[index]['hours'] == 1 ? "hr" : " hrs")
                                   )
                               ),
+                              // notes
                               Container(
                                   constraints: BoxConstraints(maxHeight: 55),
                                   margin: const EdgeInsets.fromLTRB(15, 5, 15, 15),

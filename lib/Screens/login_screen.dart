@@ -34,10 +34,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: <Widget> [
                     Container(
                       margin: EdgeInsets.fromLTRB(25, 20, 25, 10),
-                      child: TextField(
+                      child: TextField(  // EMAIL
                         controller: emailController,
                         obscureText: false,
-                        decoration: InputDecoration(
+                        decoration: InputDecoration( // remove border and round corners
                           border:
                             OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15.0),
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Container(
                       margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
-                      child: TextField(
+                      child: TextField( // PASSWORD
                         controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
@@ -70,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                    // LEADS TO FORGOT PASSWORD SCREEN
                     TextButton(
                       style: TextButton.styleFrom(
                         primary: Color(0xFF7C7C7C),
@@ -83,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       },
                     ),
+                    // LOG IN
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFF799FDA),
@@ -92,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text("log in", style: TextStyle(fontSize: 18)),
                       onPressed: () {
+                        // LOGS IN then navigates to home screen
                         FirebaseAuth.instance.signInWithEmailAndPassword(
                             email: emailController.text,
                             password: passwordController.text)
@@ -109,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
+              // Create an account section
               Expanded(
                   flex: 10,
                   child: Row(
@@ -116,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget> [
                         Text("don't have an account? ", style: TextStyle(fontSize: 15, color: Color(0xFF7C7C7C))),
-                        TextButton(
+                        TextButton(  // navigates to sign up screen
                           style: TextButton.styleFrom(
                             primary: Color(0xFF799FDA),
                             onSurface: Colors.red,

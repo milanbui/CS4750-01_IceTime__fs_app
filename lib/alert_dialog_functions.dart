@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ice_time_fs_practice_log/Screens/splash_screen.dart';
 
+/*******************************************************************************
+ * showSuccessAlertDialog
+ * displays alert dialog stating success and the text given, then navigating
+ * to the page determined by the page type
+ *
+ * text - text to display in dialog
+ * page - what page type it is navigating from
+ ******************************************************************************/
 showSuccessAlertDialog(BuildContext context, String text, String page) {
 
   // set up the button
@@ -44,6 +52,12 @@ showSuccessAlertDialog(BuildContext context, String text, String page) {
 }
 
 
+/*******************************************************************************
+ * showErrorAlertDialog
+ * displays alert dialog with given error
+ *
+ * error - error message
+ ******************************************************************************/
 showErrorAlertDialog(BuildContext context, String error) {
 
   // set up the button

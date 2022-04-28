@@ -11,8 +11,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
-  // functions
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
               SizedBox(height: 100),
               Image.asset('assets/images/splash_icon.png', height: 400, width: 400),
               SizedBox(height: 150),
+              // Button leads to log in screen when pressed
               TextButton(
                 style: TextButton.styleFrom(
                   primary: Color(0xFF7C7C7C),

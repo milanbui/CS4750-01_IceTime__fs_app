@@ -9,47 +9,68 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isEditMode = false;
-  TextEditingController _goalController = TextEditingController();
-  int _hoursPracticed = 0;
-  int _hoursLeft = 50;
-  int _lastSharpenDate = -1;
-  String _logDate = "";
-  String _logHours = "";
-  String _logNotes = "";
-  bool _progressController = true;
 
+  // VARIABLES
+  int _hoursPracticed = 0;    // Hours practiced this week
+  int _hoursLeft = 50;        // Hours left until the next sharpening is needed
+  int _lastSharpenDate = -1;  // Last day skates were sharpened
+  String _logDate = "";       // Most recent practice log date
+  String _logHours = "";      // Most recent practice log hours
+  String _logNotes = "";      // Most recent practice log notes
+  bool _progressController = true;  // Progress circle controller. wait for data to load
+  bool _isEditMode = false;         // If the page is in edit mode or not
+  TextEditingController _goalController = TextEditingController();  // Weekly practice hour goals
 
+  /*****************************************************************************
+   * _changeMode
+   * toggles the edit mode
+   ****************************************************************************/
   void _changeMode() {
     setState(() {
       _isEditMode = !_isEditMode;
     });
   }
 
+  /*****************************************************************************
+   * initState
+   * Initializes state. Has several listeners: FirbaseDatabase listeners for
+   * sharpening logs, last sharpen date, practice logs, and goals.
+   ****************************************************************************/
   @override
   void initState() {
     super.initState();
-    String id = FirebaseAuth.instance.currentUser!.uid;
 
-    List temp = [];
+    // VARIABLES
+    String id = FirebaseAuth.instance.currentUser!.uid;  // current user's id
+    List temp = []; // temporary list to sort sharpening logs and find the last
+                    // sharpen date
+
+    // SHARPENING LOG LISTENER
     FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs").onValue.listen((DatabaseEvent event) {
-      setState(() {
 
+      setState(() {
+        // If no logs found, remove any existing lastSharpenDate
         if(event.snapshot.value == null) {
           FirebaseDatabase.instance.ref("users/" + id + "/lastSharpenDate").remove();
           _progressController = false;
         }
+        // Else, if logs are found, sort and find last sharpen date
         else {
+
+          // Copy logs to temp list to obtain data values
           for(DataSnapshot data in event.snapshot.children.toList()) {
             temp.add(data.value);
           }
 
+          // Sorts in ascending order (first to last)
           temp.sort((a, b) {
             return a['date'].compareTo(b['date']);
           });
 
-          FirebaseDatabase.instance.ref("users/" + id).update({'lastSharpenDate' : temp.last['date']});
-
+          // Updates lastSharpenDate to the last sharpen date.
+          // Adds if not yet in existance
+          FirebaseDatabase.instance.ref("users/" + id)
+              .update({'lastSharpenDate' : temp.last['date']});
 
           _progressController = false;
 
@@ -57,8 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
 
-
+    // GOAL LISTENER
     FirebaseDatabase.instance .ref("users/" + id + "/goal").onValue.listen((DatabaseEvent event) {
+      // If goal exists, set goal
       if(event.snapshot.value != null) {
         setState(() {
           _goalController =
@@ -74,10 +96,15 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
+    // LAST SHARPEN DATE LISTENER
     FirebaseDatabase.instance .ref("users/" + id + "/lastSharpenDate").onValue.listen((DatabaseEvent event) {
+
+      // If last sharpen date exists
       if (event.snapshot.value != null) {
+
         setState(() {
-          print(int.tryParse(event.snapshot.value.toString()));
+
+          // Stores lastSharpenDate (in millisecondsSinceEpoch)
           _lastSharpenDate = int.parse(event.snapshot.value.toString());
 
           _progressController = false;
@@ -90,42 +117,75 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
+    // PRACTICE LOG LISTENER
     FirebaseDatabase.instance .ref("users/" + id + "/logs").onValue.listen((DatabaseEvent event) {
+      // if logs exist
       if (event.snapshot.value != null) {
         setState(()  {
+
+          // Variables
           DateTime date = DateTime.now();
-          DateTime firstDayOfWeek = DateTime(date.year, date.month, date.day - date.weekday % 7);
-          _hoursPracticed = 0;
-          int hours = 0;
+          // Gets first day of current week
+          DateTime firstDayOfWeek = DateTime(date.year, date.month,
+                                             date.day - date.weekday % 7);
+          _hoursPracticed = 0;                 // hours practice this week
+          int _hoursPracticedAfterSharpen = 0; // hours practiced since last
+                                               // sharpen
           var logsList = [];
 
+          // Copies practice logs, calcs hours practiced this week, calc
+          // hours practiced since last sharpen
           for(DataSnapshot data in event.snapshot.children.toList()) {
 
-            logsList.add(data.value);
-            DateTime compareDate = DateTime.fromMillisecondsSinceEpoch(int.parse(data.child('date').value.toString()));
-            if((compareDate.isAfter(firstDayOfWeek) || compareDate.isAtSameMomentAs(firstDayOfWeek)) && compareDate.isBefore(date)) {
+            logsList.add(data.value); // add sharpen log to temp list
+
+            // Get current log's date to compare
+            DateTime compareDate = DateTime.fromMillisecondsSinceEpoch(
+                                   int.parse(data.child('date').value.toString()));
+
+            // If current log's date is after/same day as the first day of the week
+            // and is before the current date (and time), add log hours to
+            // hours practiced this week
+            if((compareDate.isAfter(firstDayOfWeek)
+                || compareDate.isAtSameMomentAs(firstDayOfWeek))
+                && compareDate.isBefore(date)) {
+
               _hoursPracticed += int.parse(data.child('hours').value.toString());
+
             }
 
+            // If there are sharpening logs and the current date is after
+            // or on the same day as the sharpening, log hours
             if(_lastSharpenDate != -1
-                && (compareDate.isAfter(DateTime.fromMillisecondsSinceEpoch(_lastSharpenDate))
-                || compareDate.isAtSameMomentAs(DateTime.fromMillisecondsSinceEpoch(_lastSharpenDate)))) {
-              hours += int.parse(data.child('hours').value.toString());
+                && (compareDate.isAfter(
+                    DateTime.fromMillisecondsSinceEpoch(_lastSharpenDate))
+                || compareDate.isAtSameMomentAs(
+                    DateTime.fromMillisecondsSinceEpoch(_lastSharpenDate)))) {
+
+              _hoursPracticedAfterSharpen += int.parse(data.child('hours')
+                                                       .value.toString());
             }
 
           }
+
+          // Sorts practice logs in ascending order
           logsList.sort((a, b) {
             return a['date'].compareTo(b['date']);
           });
 
+          // Copies data of most recent practice log
           _logDate = logsList.last['date'].toString();
           _logHours = logsList.last['hours'].toString();
           _logNotes = logsList.last['notes'].toString();
 
+          // If there is a practice log, save hours left
           if (_lastSharpenDate != -1) {
-            _hoursLeft = 30 - hours;
+            // 30 hrs is the recommended # of hours to skate before sharpening
+            // so 30 - hours practiced to calc how many hours before it's time
+            // to sharpen again
+            _hoursLeft = 30 - _hoursPracticedAfterSharpen;
           }
-          print(_hoursLeft.toString() + " | " + hours.toString() + " | " + _lastSharpenDate.toString());
+
           _progressController = false;
         });
       }
@@ -145,23 +205,29 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                // Row - top bar with logo and edit icon button
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      // Logo
                       Container(
-                        margin: const EdgeInsets.fromLTRB(150, 25, 100, 5),
+                        margin: EdgeInsets.fromLTRB(150, 25, 100, 5),
                         child: Image.asset(
                             'assets/images/logo_image.png', height: 60,
                             width: 60),
                       ),
+                      // Edit button
                       Container(
-                        margin: const EdgeInsets.fromLTRB(0, 25, 0, 5),
+                        margin: EdgeInsets.fromLTRB(0, 25, 0, 5),
                         child: IconButton(
                           icon: _isEditMode ? Icon(Icons.done) : Icon(Icons.edit),
                           color: const Color(0xFF454545),
                           focusColor: Colors.white,
                           onPressed: () {
+                            // If is in edit mode, save button is clicked
                             if (_isEditMode) {
+
+                              // Update goal
                               FirebaseDatabase.instance.ref("users/" +
                                   FirebaseAuth.instance.currentUser!.uid)
                                   .update({'goal': _goalController.text})
@@ -176,24 +242,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ]
                 ),
-                Container(
+                // Weekly Practice Hour Goal section
+                Container( // Makes the deep blue oval container
                     height: 50,
                     margin: const EdgeInsets.fromLTRB(15, 2.5, 15, 2.5),
                     decoration: BoxDecoration(
                       color: Color(0xFF98BEEB),
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
-                    child: Row(
+                    child: Row( // Contains label and data
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text("Weekly Practice Hour Goal: ", style: TextStyle(
                             fontSize: 12, color: Color(0xFF454545))),
+                        // Changes size based on progress controller
                         SizedBox(
                             width: _progressController? 15 : 50,
                             height: _progressController? 15 : 100,
-                            child: _progressController ?
-                            CircularProgressIndicator(color: Color(0xFF454545),)
-                             :
+                            child:
+                            _progressController ?
+                            CircularProgressIndicator(color: Color(0xFF454545),) :
                             TextField(
                               style: TextStyle(color: Color(0xFF454545)),
                               controller: _goalController,
@@ -211,6 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     )
                 ),
+                // HOURS PRACTICED THIS WEEK SECTION
                 Container(
                     height: 50,
                     margin: const EdgeInsets.fromLTRB(15, 2.5, 15, 2.5),
@@ -239,6 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     )
                 ),
+                // HOURS UNTIL NEXT SHARPENING SECTION
                 Container(
                     height: 50,
                     margin: const EdgeInsets.fromLTRB(15, 2.5, 15, 2.5),
@@ -269,11 +339,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                 ),
                 SizedBox(height: 15),
+                // MOST RECENT PRACTICE LOG SECTION
                 Text("Last Practice Log", style: TextStyle(fontSize: 15,
                     color: Color(0xFF454545),
                     fontWeight: FontWeight.bold)),
+                // Holds last practice log data
                 Container(
-                    margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                    margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
                     decoration: BoxDecoration(
                       color: Color(0xFF98BEEB),
                       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -281,8 +353,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                            margin: const EdgeInsets.fromLTRB(15, 15, 15, 8),
+                        Container( // Date line
+                            margin: EdgeInsets.fromLTRB(15, 15, 15, 8),
                             child: Row(
                               children: [
                                 Text("DATE: ",
@@ -315,8 +387,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             )
                         ),
-                        Container(
-                            margin: const EdgeInsets.fromLTRB(15, 8, 15, 8),
+                        Container( // hours line
+                            margin: EdgeInsets.fromLTRB(15, 8, 15, 8),
                             child: Row(
                               children: [
                                 Text("HOURS: ",
@@ -337,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             )
                         ),
-                        Container(
+                        Container( // Notes line
                           constraints: BoxConstraints(maxHeight: 320),
                           margin: const EdgeInsets.fromLTRB(15, 8, 15, 2),
                           child: Text("NOTES:", style: TextStyle(

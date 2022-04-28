@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
+
 class AddSharpeningLogScreen extends StatefulWidget {
   @override
   _AddSharpeningLogScreenState createState() => _AddSharpeningLogScreenState();
@@ -11,8 +12,6 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
 
   TextEditingController hoursController = TextEditingController();
   TextEditingController notesController = TextEditingController();
-  User? user = FirebaseAuth.instance.currentUser;
-
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -39,7 +38,6 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                 SizedBox(height: 25),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  //mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
                       height: 50,
@@ -50,6 +48,7 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
+                      // Displays date as day - month - year
                       child: Text(
                           _selectedDate.toLocal().day.toString() + " - "
                               + _selectedDate.toLocal().month.toString() + " - "
@@ -66,6 +65,7 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                       ),
                       child: Text("select date", style: TextStyle(fontSize: 18)),
                       onPressed: () async {
+                        // Shows date picker as a dialog and returns selected date
                         DateTime? selected = await showDatePicker(
                           context: context,
                           initialDate: _selectedDate,
@@ -74,6 +74,7 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
 
                         );
 
+                        // Sets selected date
                         if (selected != null && selected != _selectedDate) {
                           setState(() {
                             _selectedDate = selected;
@@ -84,13 +85,14 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                   ],
                 ),
                 SizedBox(height: 10),
+                // Intrinsic height - container matches text field's state
                 IntrinsicHeight(
                   child: Container(
                     margin: EdgeInsets.fromLTRB(25, 0, 25, 0),
                     child: TextField(
                       textAlignVertical: TextAlignVertical.top,
-                      minLines: null,
-                      maxLines: null,
+                      minLines: null, // allows for expanding
+                      maxLines: null, // allows for expanding
                       expands: true,
                       controller: notesController,
                       obscureText: false,
@@ -127,6 +129,7 @@ class _AddSharpeningLogScreenState extends State<AddSharpeningLogScreen> {
                       "notes" : notesController.text,
                     };
 
+                    // adds log it database
                     FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/" + log['timeStamp'].toString()).set(log)
                          .then((value)  {
                           Navigator.pop(context);

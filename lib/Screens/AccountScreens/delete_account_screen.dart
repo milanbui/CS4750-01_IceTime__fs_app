@@ -14,8 +14,6 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-    User? user = FirebaseAuth.instance.currentUser;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

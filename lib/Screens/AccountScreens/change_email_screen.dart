@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ice_time_fs_practice_log/Screens/account_screen.dart';
 import 'package:ice_time_fs_practice_log/alert_dialog_functions.dart';
+
 class ChangeEmailScreen extends StatefulWidget {
   @override
   _ChangeEmailScreenState createState() => _ChangeEmailScreenState();
@@ -12,8 +12,6 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController newEmailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {

@@ -1,18 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../alert_dialog_functions.dart';
 
 class EditSharpeningLogScreen extends StatefulWidget {
   final String d;
   EditSharpeningLogScreen(this.d);
+
   @override
   _EditSharpeningLogScreenState createState() => _EditSharpeningLogScreenState();
 }
 
 class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
+
   bool _isEditMode = false;
   TextEditingController _notesController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
@@ -21,11 +21,14 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
   void initState() {
     super.initState();
 
-    String id =  FirebaseAuth.instance.currentUser!.uid;
-    FirebaseDatabase.instance.ref("users/" + id + "/sharpeningLogs/" + widget.d).onValue.listen((DatabaseEvent event) {
+    // sharpening log listener
+    FirebaseDatabase.instance.ref("users/" + FirebaseAuth.instance.currentUser!.uid + "/sharpeningLogs/"
+                     + widget.d).onValue.listen((DatabaseEvent event) {
       setState(() {
-        _selectedDate = DateTime.fromMillisecondsSinceEpoch(int.parse(event.snapshot.child('date').value.toString()));
-        _notesController = TextEditingController(text: event.snapshot.child('notes').value.toString());
+        _selectedDate = DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(event.snapshot.child('date').value.toString()));
+        _notesController = TextEditingController(text: event.snapshot
+                                               .child('notes').value.toString());
 
       });
     });
@@ -92,7 +95,7 @@ class _EditSharpeningLogScreenState extends State<EditSharpeningLogScreen> {
                       ),
                       Expanded(
                         flex: _isEditMode ? 0 : 15,
-                        child: Visibility(
+                        child: Visibility(  // delete button only visible when NOT in edit mode
                           visible: !_isEditMode,
                           child: Container(
                             margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
