@@ -8,3 +8,6 @@ This app has several features:
 - logging practices
 - logging skate sharpening dates
 - setting a weekly practice goal
+
+App on Google Play Store: https://play.google.com/store/apps/details?id=edu.cpp.cs4750.icetimeapp.ice_time_fs_practice_log
+App Landing Page: https://mimibui.wixsite.com/ice-time
